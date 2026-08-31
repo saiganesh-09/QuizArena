@@ -1,0 +1,119 @@
+/**
+ * Global design tokens and base styles for QuizArena.
+ * SCSS only — no external CSS framework.
+ *
+ * Theming: Light mode is the default (:root). Dark mode is activated
+ * by setting `data-theme="dark"` on the <html> element. All components
+ * reference the CSS custom properties below, so switching themes is
+ * a single attribute change with no re-render needed.
+ */
+
+:root {
+  // Color palette — light theme (default)
+  --qa-color-primary: #4f8cff;
+  --qa-color-primary-hover: #3a78f0;
+  --qa-color-focus: #4f8cff;
+  --qa-color-danger: #e5484d;
+  --qa-color-danger-hover: #cf3a3f;
+  --qa-color-success: #22c55e;
+  --qa-color-warning: #f59e0b;
+  --qa-color-text: #1f2937;
+  --qa-color-muted: #6b7280;
+  --qa-color-border: #e5e7eb;
+  --qa-color-surface: #ffffff;
+  --qa-color-surface-alt: #f3f4f6;
+  --qa-color-bg: #f7f8fb;
+  --qa-color-shadow: rgba(0, 0, 0, 0.06);
+  --qa-color-overlay: rgba(0, 0, 0, 0.4);
+
+  // Typography
+  --qa-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --qa-font-mono: 'SFMono-Regular', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  // Spacing scale
+  --qa-space-1: 0.25rem;
+  --qa-space-2: 0.5rem;
+  --qa-space-3: 0.75rem;
+  --qa-space-4: 1rem;
+  --qa-space-5: 1.5rem;
+  --qa-space-6: 2rem;
+
+  // Radius
+  --qa-radius-sm: 6px;
+  --qa-radius-md: 8px;
+  --qa-radius-lg: 12px;
+}
+
+// Dark theme — activated by [data-theme="dark] on <html>.
+// Only the color tokens are overridden; spacing/typography/radius are
+// theme-independent.
+[data-theme='dark'] {
+  --qa-color-primary: #5b9eff;
+  --qa-color-primary-hover: #4a8df0;
+  --qa-color-focus: #5b9eff;
+  --qa-color-danger: #ff6b6b;
+  --qa-color-danger-hover: #e85555;
+  --qa-color-success: #4ade80;
+  --qa-color-warning: #fbbf24;
+  --qa-color-text: #e5e7eb;
+  --qa-color-muted: #9ca3af;
+  --qa-color-border: #374151;
+  --qa-color-surface: #1f2937;
+  --qa-color-surface-alt: #111827;
+  --qa-color-bg: #0f172a;
+  --qa-color-shadow: rgba(0, 0, 0, 0.3);
+  --qa-color-overlay: rgba(0, 0, 0, 0.6);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--qa-font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--qa-color-text);
+  background-color: var(--qa-color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+// Respect reduced-motion preferences.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

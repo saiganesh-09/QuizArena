@@ -1,0 +1,17 @@
+.qa-stat-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid var(--qa-color-border, #e5e7eb);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  &__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--qa-color-text, #1f2937);
+  }
+}

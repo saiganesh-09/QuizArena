@@ -1,0 +1,21 @@
+.qa-login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #4f8cff 0%, #6d5dfc 100%);
+
+  &__card {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__theme {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+  }
+}

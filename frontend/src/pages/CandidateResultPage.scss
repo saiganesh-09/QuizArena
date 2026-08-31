@@ -1,0 +1,51 @@
+.qa-candidate-result-page {
+  display: flex;
+  flex-direction: column;
+
+  &--loading,
+  &--error {
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    color: var(--qa-color-muted, #6b7280);
+  }
+
+  &__error-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2rem;
+    background-color: #fff;
+    border: 1px solid var(--qa-color-border, #e5e7eb);
+    border-radius: 12px;
+    text-align: center;
+
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: var(--qa-color-text, #1f2937);
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--qa-color-muted, #6b7280);
+    }
+  }
+
+  &__back {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--qa-color-primary, #4f8cff);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}

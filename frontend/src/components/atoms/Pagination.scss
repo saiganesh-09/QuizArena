@@ -1,0 +1,53 @@
+.qa-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 0;
+
+  &__count {
+    font-size: 0.8125rem;
+    color: var(--qa-color-muted, #6b7280);
+  }
+
+  &__nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  &__btn {
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.5rem;
+    border: 1px solid var(--qa-color-border, #d1d5db);
+    background-color: #fff;
+    color: var(--qa-color-text, #1f2937);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+
+    &:hover:not(:disabled):not(&--active) {
+      background-color: var(--qa-color-surface-alt, #f3f4f6);
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    &--active {
+      background-color: var(--qa-color-primary, #4f8cff);
+      border-color: var(--qa-color-primary, #4f8cff);
+      color: #fff;
+      cursor: default;
+    }
+  }
+
+  &__gap {
+    padding: 0 0.25rem;
+    color: var(--qa-color-muted, #6b7280);
+  }
+}

@@ -1,0 +1,50 @@
+.qa-search-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+  background-color: #fff;
+  border: 1px solid var(--qa-color-border, #d1d5db);
+  border-radius: 8px;
+  min-width: 240px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:focus-within {
+    border-color: var(--qa-color-primary, #4f8cff);
+    box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.18);
+  }
+
+  &__icon {
+    font-size: 1.1rem;
+    color: var(--qa-color-muted, #9ca3af);
+  }
+
+  &__input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 0.5rem 0;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--qa-color-text, #1f2937);
+    background: transparent;
+
+    &::-webkit-search-cancel-button {
+      display: none;
+    }
+  }
+
+  &__clear {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: var(--qa-color-muted, #6b7280);
+    cursor: pointer;
+    padding: 0 0.125rem;
+
+    &:hover {
+      color: var(--qa-color-text, #1f2937);
+    }
+  }
+}

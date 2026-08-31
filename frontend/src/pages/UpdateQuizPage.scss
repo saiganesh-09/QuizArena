@@ -1,0 +1,50 @@
+.qa-update-quiz {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  &--loading {
+    padding: 3rem;
+    text-align: center;
+    color: var(--qa-color-muted, #6b7280);
+  }
+
+  &__topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__back {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--qa-color-primary, #4f8cff);
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  &__tabs {
+    background-color: #fff;
+    border: 1px solid var(--qa-color-border, #e5e7eb);
+    border-radius: 12px 12px 0 0;
+    padding: 0 0.5rem;
+  }
+
+  &__panel {
+    background-color: #fff;
+    border: 1px solid var(--qa-color-border, #e5e7eb);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    padding: 1.25rem;
+  }
+}

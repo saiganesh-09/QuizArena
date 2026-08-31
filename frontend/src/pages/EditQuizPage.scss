@@ -1,0 +1,10 @@
+.qa-edit-quiz-page {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+
+  &--loading {
+    min-height: 50vh;
+    align-items: center;
+  }
+}

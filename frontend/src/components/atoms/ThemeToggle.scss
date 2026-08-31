@@ -1,0 +1,43 @@
+.qa-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+
+  &__track {
+    display: inline-flex;
+    align-items: center;
+    width: 3rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    background-color: var(--qa-color-surface-alt);
+    border: 1px solid var(--qa-color-border);
+    padding: 0.125rem;
+    transition: background-color 0.2s ease;
+  }
+
+  &__thumb {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background-color: var(--qa-color-surface);
+    box-shadow: 0 1px 3px var(--qa-color-shadow);
+    font-size: 0.75rem;
+    transition: transform 0.2s ease;
+  }
+
+  &--dark {
+    .qa-theme-toggle__track {
+      background-color: rgba(91, 158, 255, 0.2);
+    }
+    .qa-theme-toggle__thumb {
+      transform: translateX(1.5rem);
+    }
+  }
+}

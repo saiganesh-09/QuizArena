@@ -1,0 +1,24 @@
+.qa-my-quizzes-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &__heading {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--qa-color-text, #1f2937);
+  }
+
+  &__subheading {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--qa-color-muted, #6b7280);
+  }
+}

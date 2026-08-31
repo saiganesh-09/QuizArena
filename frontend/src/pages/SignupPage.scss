@@ -1,0 +1,14 @@
+.qa-signup-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #6d5dfc 0%, #4f8cff 100%);
+
+  &__card {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+}

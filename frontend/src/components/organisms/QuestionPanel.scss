@@ -1,0 +1,125 @@
+.qa-question-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  flex: 1;
+  min-width: 0;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--qa-color-border, #e5e7eb);
+  }
+
+  &__number {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--qa-color-text, #1f2937);
+  }
+
+  &__meta {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  &__type {
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background-color: var(--qa-color-surface-alt, #f3f4f6);
+    color: var(--qa-color-muted, #6b7280);
+    font-weight: 600;
+  }
+
+  &__points {
+    color: var(--qa-color-primary, #4f8cff);
+    font-weight: 700;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+  }
+
+  &__text {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--qa-color-text, #1f2937);
+    line-height: 1.6;
+  }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--qa-color-border, #e5e7eb);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.12s ease, background-color 0.12s ease;
+
+    &:hover {
+      border-color: var(--qa-color-primary, #4f8cff);
+    }
+
+    &--selected {
+      border-color: var(--qa-color-primary, #4f8cff);
+      background-color: rgba(79, 140, 255, 0.06);
+    }
+  }
+
+  &__option-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &__option-marker {
+    font-size: 1.25rem;
+    color: var(--qa-color-primary, #4f8cff);
+    flex-shrink: 0;
+    width: 1.5rem;
+    text-align: center;
+  }
+
+  &__option-text {
+    font-size: 0.95rem;
+    color: var(--qa-color-text, #1f2937);
+  }
+
+  &__clear {
+    align-self: flex-start;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    color: var(--qa-color-muted, #6b7280);
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--qa-color-danger, #e5484d);
+    }
+  }
+
+  &__nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--qa-color-border, #e5e7eb);
+  }
+}

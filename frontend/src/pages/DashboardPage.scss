@@ -1,0 +1,41 @@
+.qa-dashboard {
+  min-height: 100vh;
+  background-color: var(--qa-color-bg, #f7f8fb);
+
+  &__main {
+    padding: 2rem 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  &__panel {
+    background-color: #fff;
+    border: 1px solid var(--qa-color-border, #e5e7eb);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+  }
+
+  &__title {
+    margin: 0 0 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--qa-color-text, #1f2937);
+  }
+
+  &__subtitle {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    color: var(--qa-color-text, #1f2937);
+
+    strong {
+      text-transform: capitalize;
+    }
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--qa-color-muted, #6b7280);
+  }
+}

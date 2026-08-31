@@ -1,0 +1,43 @@
+.qa-candidate-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &__heading {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--qa-color-text, #1f2937);
+  }
+
+  &__subheading {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--qa-color-muted, #6b7280);
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+  }
+
+  &__section-title {
+    margin: 0 0 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--qa-color-text, #1f2937);
+  }
+
+  &__upcoming-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+}
