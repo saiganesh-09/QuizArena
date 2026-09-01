@@ -23,11 +23,24 @@ export function createApp(): Express {
   // Security headers
   app.use(helmet());
 
-  // CORS: allow the configured client origin and enable credentials so
-  // the HTTP-only cookie can be sent cross-origin.
+  // CORS: allow the configured client origin(s) and enable credentials so
+  // the HTTP-only cookie can be sent cross-origin. In production, the
+  // frontend (Vercel) and backend (Railway) are on different domains, so
+  // we need to explicitly allow the frontend URL.
+  const allowedOrigins = [
+    config.cors.clientOrigin,
+    ...config.cors.allowedOrigins,
+  ];
   app.use(
     cors({
-      origin: config.cors.clientOrigin,
+      origin: (origin, callback) => {
+        // Allow requests with no origin (curl, Postman, server-to-server)
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error(`Origin ${origin} not allowed by CORS`));
+        }
+      },
       credentials: true,
     }),
   );

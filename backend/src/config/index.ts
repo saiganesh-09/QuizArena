@@ -26,6 +26,7 @@ export interface AppConfig {
   };
   cors: {
     clientOrigin: string;
+    allowedOrigins: string[];
   };
 }
 
@@ -59,5 +60,9 @@ export const config: AppConfig = {
   },
   cors: {
     clientOrigin: env.CLIENT_ORIGIN ?? 'http://localhost:5173',
+    allowedOrigins: (env.ALLOWED_ORIGINS ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
   },
 };
