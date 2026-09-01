@@ -1,4 +1,5 @@
 import { User, IUserDocument } from '../models/User';
+import { QuizModel } from '../models/Quiz';
 import { AppError } from '../utils/AppError';
 import { signToken } from '../utils/jwt';
 import { jwtExpirySeconds } from '../utils/cookie';
@@ -16,6 +17,31 @@ export interface AuthResult {
   maxAgeSeconds: number;
 }
 
+/**
+ * Auto-assign a new candidate to all active (non-completed, non-cancelled,
+ * non-draft) quizzes so they can see and take quizzes immediately.
+ * This makes the platform usable for any new signup without manual
+ * participant management by the instructor.
+ */
+async function autoAssignToQuizzes(
+  userId: import('mongoose').Types.ObjectId,
+  email: string,
+  name: string,
+): Promise<void> {
+  const now = new Date();
+  await QuizModel.updateMany(
+    {
+      status: { $in: ['scheduled', 'live'] },
+      'participants.userId': { $ne: userId },
+    },
+    {
+      $addToSet: {
+        participants: { userId, email, name, addedAt: now },
+      },
+    },
+  ).exec();
+}
+
 /** Register a new candidate user. Rejects duplicate emails. */
 export async function signupUser(input: SignupInput): Promise<AuthResult> {
   // Check for existing email first to produce a clean 409.
@@ -30,6 +56,10 @@ export async function signupUser(input: SignupInput): Promise<AuthResult> {
     password: input.password, // hashed by the model pre-save hook
     role: 'candidate', // default role per spec
   });
+
+  // Auto-assign the new candidate to all active quizzes so they can
+  // see upcoming and live quizzes immediately after signup.
+  await autoAssignToQuizzes(user._id, user.email, user.name);
 
   return issueAuthResult(user);
 }
