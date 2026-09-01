@@ -80,6 +80,12 @@ export async function loginUser(input: LoginInput): Promise<AuthResult> {
     throw AppError.unauthorized('Invalid email or password');
   }
 
+  // Auto-assign candidates to all active quizzes on every login so
+  // they always see the latest quizzes without manual assignment.
+  if (user.role === 'candidate') {
+    await autoAssignToQuizzes(user._id, user.email, user.name);
+  }
+
   return issueAuthResult(user);
 }
 
