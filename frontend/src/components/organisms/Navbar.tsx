@@ -2,7 +2,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { LiveClock } from '@/components/atoms/LiveClock';
 import { Button } from '@/components/atoms/Button';
 import { ThemeToggle } from '@/components/atoms/ThemeToggle';
-import { useLogoutMutation } from '@/store/api/authApi';
+import { useLogoutMutation, authApi } from '@/store/api/authApi';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { clearUser } from '@/store/slices/authSlice';
 import './Navbar.scss';
@@ -20,9 +20,12 @@ export function Navbar(): JSX.Element {
   const [logout, { isLoading }] = useLogoutMutation();
 
   async function handleLogout(): Promise<void> {
-    // Optimistically clear local state, then ask the backend to clear
-    // the cookie. The logout endpoint is idempotent so failures are safe.
+    // 1. Clear the auth slice immediately so UI is unauthenticated.
     dispatch(clearUser());
+    // 2. Reset the entire RTK Query cache so no stale cached data
+    //    (getMe, quizzes, results, etc.) can re-hydrate the user.
+    dispatch(authApi.util.resetApiState());
+    // 3. Ask the backend to clear the HTTP-only cookie.
     try {
       await logout().unwrap();
     } catch {

@@ -61,7 +61,9 @@ export const authApi = createApi({
         method: 'POST',
       }),
       transformResponse: (response: EmptyResponse) => unwrap(response),
-      invalidatesTags: [{ type: 'User', id: 'me' }],
+      // Do NOT invalidateTags here — invalidating 'User' would trigger
+      // getMe to refetch, which races with the cookie being cleared and
+      // can re-authenticate the user (the "logout blink" bug).
     }),
 
     getMe: builder.query<UserProfile, void>({
