@@ -20,3 +20,6 @@ npm-debug.log*
 .vscode/
 *.tsbuildinfo
 .vercel
+
+.vercel
+.env*
