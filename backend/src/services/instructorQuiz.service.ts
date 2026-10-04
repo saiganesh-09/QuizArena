@@ -149,7 +149,10 @@ export async function publishInstructorQuiz(quiz: IQuizDocument): Promise<Instru
     );
   }
 
-  await quiz.transitionTo('scheduled');
+  // Homework whose window is already open goes straight to Live.
+  const alreadyOpen =
+    quiz.startTime instanceof Date && quiz.startTime.getTime() <= Date.now();
+  await quiz.transitionTo(quiz.kind === 'homework' && alreadyOpen ? 'live' : 'scheduled');
   return quiz.toInstructorQuiz();
 }
 
