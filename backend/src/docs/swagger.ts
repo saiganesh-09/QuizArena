@@ -733,6 +733,48 @@ export const swaggerSpec: OpenAPIV3.Document = {
     },
 
     // ---- Candidate ----
+    '/candidate/performance': {
+      get: {
+        tags: ['Candidate'],
+        summary: 'Get the candidate\'s own performance summary (avg %, best score, latest rank, per-quiz trend)',
+        security: [{ cookieAuth: [] }],
+        responses: {
+          '200': {
+            description: 'Performance summary',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    attemptsTaken: { type: 'integer' },
+                    averagePercentage: { type: 'integer' },
+                    bestPercentage: { type: 'integer' },
+                    bestQuizTitle: { type: 'string', nullable: true },
+                    latestRank: { type: 'integer', nullable: true },
+                    latestRankOutOf: { type: 'integer', nullable: true },
+                    latestQuizTitle: { type: 'string', nullable: true },
+                    trend: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          quizId: { type: 'string' },
+                          quizTitle: { type: 'string' },
+                          percentage: { type: 'integer' },
+                          submittedAt: { type: 'string', format: 'date-time', nullable: true },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthenticated' },
+          '403': { description: 'Not a candidate' },
+        },
+      },
+    },
     '/candidate/quizzes': {
       get: {
         tags: ['Candidate'],

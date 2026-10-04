@@ -289,6 +289,26 @@ export interface CandidateResult {
   questions: QuestionReview[];
 }
 
+/** One point in a candidate's score trend (one submitted attempt). */
+export interface CandidateScorePoint {
+  quizId: string;
+  quizTitle: string;
+  percentage: number;
+  submittedAt: string | null;
+}
+
+/** Candidate's own performance summary across all submitted attempts. */
+export interface CandidatePerformance {
+  attemptsTaken: number;
+  averagePercentage: number;
+  bestPercentage: number;
+  bestQuizTitle: string | null;
+  latestRank: number | null;
+  latestRankOutOf: number | null;
+  latestQuizTitle: string | null;
+  trend: CandidateScorePoint[];
+}
+
 /** A single candidate's result row in the instructor aggregated view. */
 export interface CandidateResultRow {
   attemptId: string;

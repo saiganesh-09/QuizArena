@@ -1,5 +1,8 @@
 import type { Request, Response, NextFunction } from 'express';
-import { getCandidateResult } from '../services/candidateResult.service';
+import {
+  getCandidateResult,
+  getCandidatePerformance,
+} from '../services/candidateResult.service';
 import {
   getInstructorQuizResults,
   getInstructorAttemptDetail,
@@ -9,6 +12,7 @@ import { AppError } from '../utils/AppError';
 import type { ApiSuccessBody } from '../types/auth';
 import type {
   CandidateResult,
+  CandidatePerformance,
   InstructorQuizResults,
   InstructorAttemptDetail,
   AdminAnalytics,
@@ -28,6 +32,20 @@ export function getCandidateResultHandler(req: Request, res: Response, next: Nex
       if (!req.user?.sub) throw AppError.unauthorized('Authentication required');
       const result = await getCandidateResult(req.user.sub, req.params.id);
       const body: ApiSuccessBody<CandidateResult> = { success: true, data: result };
+      res.status(200).json(body);
+    } catch (err) {
+      next(err);
+    }
+  })();
+}
+
+/** GET /candidate/performance — the candidate's own performance summary. */
+export function getCandidatePerformanceHandler(req: Request, res: Response, next: NextFunction): void {
+  void (async () => {
+    try {
+      if (!req.user?.sub) throw AppError.unauthorized('Authentication required');
+      const result = await getCandidatePerformance(req.user.sub);
+      const body: ApiSuccessBody<CandidatePerformance> = { success: true, data: result };
       res.status(200).json(body);
     } catch (err) {
       next(err);

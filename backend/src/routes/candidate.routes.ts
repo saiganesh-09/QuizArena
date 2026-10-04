@@ -10,7 +10,10 @@ import {
   submitQuizAttempt,
   getQuizAttempt,
 } from '../controllers/attempt.controller';
-import { getCandidateResultHandler } from '../controllers/result.controller';
+import {
+  getCandidateResultHandler,
+  getCandidatePerformanceHandler,
+} from '../controllers/result.controller';
 import { candidateQuizListQuerySchema } from '../schemas/candidate.schema';
 import { submitAnswersSchema } from '../schemas/attempt.schema';
 
@@ -28,6 +31,9 @@ import { submitAnswersSchema } from '../schemas/attempt.schema';
 const router = Router();
 
 router.use(requireAuth, requireRole('candidate'));
+
+// ---- Performance summary (own attempts only) ----
+router.get('/performance', getCandidatePerformanceHandler);
 
 // ---- Quiz list (assignment-filtered) ----
 router.get('/quizzes', validateQuery(candidateQuizListQuerySchema), listCandidateQuizzesHandler);

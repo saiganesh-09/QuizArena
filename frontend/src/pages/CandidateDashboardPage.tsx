@@ -2,9 +2,10 @@ import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { StatCard } from '@/components/atoms/StatCard';
 import { CandidateQuizTable } from '@/components/organisms/CandidateQuizTable';
+import { CandidatePerformancePanel } from '@/components/organisms/CandidatePerformancePanel';
 import { UpcomingQuizCard } from '@/components/organisms/UpcomingQuizCard';
 import { EmptyState } from '@/components/atoms/EmptyState';
-import { useListCandidateQuizzesQuery } from '@/store/api/candidateApi';
+import { useListCandidateQuizzesQuery, useGetCandidatePerformanceQuery } from '@/store/api/candidateApi';
 import type { CandidateQuizMeta } from '@/types/quiz';
 import './CandidateDashboardPage.scss';
 
@@ -35,6 +36,9 @@ export function CandidateDashboardPage(): JSX.Element {
     sortBy: 'startTime',
     sortOrder: 'asc',
   });
+
+  // Own performance summary (avg score, best score, latest rank, trend).
+  const { data: performance } = useGetCandidatePerformanceQuery();
 
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value);
@@ -74,6 +78,9 @@ export function CandidateDashboardPage(): JSX.Element {
         <StatCard label="Live Now" value={stats?.live ?? 0} icon="●" tone="success" />
         <StatCard label="Completed" value={stats?.completed ?? 0} icon="✓" tone="warning" />
       </section>
+
+      {/* Own performance: average score ring, highlights, score trend */}
+      {performance && <CandidatePerformancePanel performance={performance} />}
 
       {/* Upcoming quiz cards with countdown timers */}
       <section className="qa-candidate-dashboard__upcoming">

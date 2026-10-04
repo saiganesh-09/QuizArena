@@ -1,7 +1,14 @@
+import mongoose from 'mongoose';
 import { AttemptModel } from '../models/Attempt';
 import { QuizModel, IQuestionDoc } from '../models/Quiz';
 import { AppError } from '../utils/AppError';
-import type { CandidateResult, QuestionReview } from '../types/quiz';
+import type {
+  CandidateResult,
+  CandidatePerformance,
+  CandidateScorePoint,
+  QuestionReview,
+  AttemptStatus,
+} from '../types/quiz';
 
 /**
  * Candidate result service.
@@ -107,5 +114,87 @@ export async function getCandidateResult(
     submittedAt: attempt.submittedAt instanceof Date ? attempt.submittedAt.toISOString() : null,
     autoSubmitted: attempt.autoSubmitted,
     questions,
+  };
+}
+
+/**
+ * Get the calling candidate's own performance summary across all their
+ * submitted attempts.
+ *
+ * SECURITY & PRIVACY:
+ * - Only reads the calling candidate's own attempt documents.
+ * - `latestRank` compares their stored score to the COUNT of higher
+ *   scores on the same quiz — an aggregate position, never another
+ *   student's data.
+ */
+export async function getCandidatePerformance(
+  candidateId: string,
+): Promise<CandidatePerformance> {
+  const attempts = await AttemptModel.find({
+    candidateId: new mongoose.Types.ObjectId(candidateId),
+    status: { $in: ['submitted', 'auto-submitted'] as AttemptStatus[] },
+  }).exec();
+
+  const points: CandidateScorePoint[] = attempts
+    .slice()
+    .sort((a, b) => {
+      const ta = a.submittedAt instanceof Date ? a.submittedAt.getTime() : 0;
+      const tb = b.submittedAt instanceof Date ? b.submittedAt.getTime() : 0;
+      return ta - tb;
+    })
+    .map((a) => ({
+      quizId: a.quizId.toString(),
+      quizTitle: a.quizTitle,
+      percentage: a.maxScore > 0 ? Math.round((a.score / a.maxScore) * 100) : 0,
+      submittedAt: a.submittedAt instanceof Date ? a.submittedAt.toISOString() : null,
+    }));
+
+  const attemptsTaken = points.length;
+  const percentages = points.map((p) => p.percentage);
+  const averagePercentage = attemptsTaken > 0
+    ? Math.round(percentages.reduce((s, p) => s + p, 0) / attemptsTaken)
+    : 0;
+
+  let bestPercentage = 0;
+  let bestQuizTitle: string | null = null;
+  for (const p of points) {
+    if (p.percentage >= bestPercentage) {
+      bestPercentage = p.percentage;
+      bestQuizTitle = p.quizTitle;
+    }
+  }
+
+  // Rank within the most recent quiz's cohort (competition ranking).
+  let latestRank: number | null = null;
+  let latestRankOutOf: number | null = null;
+  let latestQuizTitle: string | null = null;
+  const latest = attempts.reduce<typeof attempts[number] | null>((acc, a) => {
+    const t = a.submittedAt instanceof Date ? a.submittedAt.getTime() : 0;
+    const bt = acc?.submittedAt instanceof Date ? acc.submittedAt.getTime() : 0;
+    return acc === null || t > bt ? a : acc;
+  }, null);
+  if (latest) {
+    const cohortFilter = {
+      quizId: latest.quizId,
+      status: { $in: ['submitted', 'auto-submitted'] as AttemptStatus[] },
+    };
+    const [higher, total] = await Promise.all([
+      AttemptModel.countDocuments({ ...cohortFilter, score: { $gt: latest.score } }).exec(),
+      AttemptModel.countDocuments(cohortFilter).exec(),
+    ]);
+    latestRank = higher + 1;
+    latestRankOutOf = total;
+    latestQuizTitle = latest.quizTitle;
+  }
+
+  return {
+    attemptsTaken,
+    averagePercentage,
+    bestPercentage,
+    bestQuizTitle,
+    latestRank,
+    latestRankOutOf,
+    latestQuizTitle,
+    trend: points,
   };
 }
