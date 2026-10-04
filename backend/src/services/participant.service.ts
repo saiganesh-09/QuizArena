@@ -1,4 +1,5 @@
-import { QuizModel, IQuizDocument, IParticipantDoc } from '../models/Quiz';
+import mongoose from 'mongoose';
+import { IQuizDocument, IParticipantDoc } from '../models/Quiz';
 import { User } from '../models/User';
 import { AppError } from '../utils/AppError';
 import { parseCsvBuffer } from '../utils/csv';
@@ -75,8 +76,8 @@ export async function addParticipant(
   }
 
   const newParticipant: IParticipantDoc = {
-    _id: new (QuizModel.db as unknown as { Types: { ObjectId: new () => import('mongoose').Types.ObjectId } }).Types.ObjectId() as unknown as import('mongoose').Types.ObjectId,
-    userId: candidate._id as unknown as import('mongoose').Types.ObjectId,
+    _id: new mongoose.Types.ObjectId(),
+    userId: candidate._id as unknown as mongoose.Types.ObjectId,
     email: candidate.email,
     name: candidate.name,
     addedAt: new Date(),
@@ -214,8 +215,8 @@ export async function bulkUploadParticipants(
     }
     seenInBatch.add(userIdStr);
     newParticipants.push({
-      _id: new (QuizModel.db as unknown as { Types: { ObjectId: new () => import('mongoose').Types.ObjectId } }).Types.ObjectId() as unknown as import('mongoose').Types.ObjectId,
-      userId: candidate._id as unknown as import('mongoose').Types.ObjectId,
+      _id: new mongoose.Types.ObjectId(),
+      userId: candidate._id as unknown as mongoose.Types.ObjectId,
       email: candidate.email,
       name: candidate.name,
       addedAt: new Date(),
