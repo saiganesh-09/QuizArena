@@ -1,5 +1,9 @@
 # QuizArena
 
+**Live:** https://quizarena-hazel.vercel.app — backend API: https://quizarena-api-olive.vercel.app (docs at `/api-docs`, health at `/health/health`)
+
+Demo accounts (password `Password123!`): `admin@quiz.com` · `teacher@quiz.com` (instructor) · `candidate@quiz.com`
+
 Multi-role quiz platform with three personas: **Admin**, **Instructor**, and **Participant/Candidate**.
 
 Built across 7 milestones covering authentication, admin/instructor/candidate flows, a secure examination engine, results & analytics, dark mode, comprehensive testing, and full API documentation.
