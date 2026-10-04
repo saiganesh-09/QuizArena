@@ -110,6 +110,7 @@ export function InstructorResultsDashboard({
               <table className="qa-instructor-results__table">
                 <thead>
                   <tr>
+                    <th className="qa-instructor-results__th">Rank</th>
                     <th className="qa-instructor-results__th">Candidate</th>
                     <th className="qa-instructor-results__th">Score</th>
                     <th className="qa-instructor-results__th">Percentage</th>
@@ -123,6 +124,11 @@ export function InstructorResultsDashboard({
                 <tbody>
                   {results.candidates.map((row) => (
                     <tr key={row.attemptId} className="qa-instructor-results__tr">
+                      <td className="qa-instructor-results__td">
+                        <span className={`qa-instructor-results__rank qa-instructor-results__rank--${row.rank === 1 ? 'gold' : row.rank === 2 ? 'silver' : row.rank === 3 ? 'bronze' : 'plain'}`}>
+                          #{row.rank}
+                        </span>
+                      </td>
                       <td className="qa-instructor-results__td qa-instructor-results__td--name">
                         <div className="qa-instructor-results__candidate">
                           <span className="qa-instructor-results__candidate-name">{row.candidateName}</span>

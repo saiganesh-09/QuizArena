@@ -295,6 +295,8 @@ export interface CandidateResultRow {
   candidateId: string;
   candidateName: string;
   candidateEmail: string;
+  /** Competition rank by score (1-based; ties share the same rank). */
+  rank: number;
   score: number;
   maxScore: number;
   percentage: number;
@@ -302,6 +304,41 @@ export interface CandidateResultRow {
   timeTakenSeconds: number;
   status: AttemptStatus;
   submittedAt: string | null;
+}
+
+/** A single answer inside an instructor's attempt-detail view. */
+export interface AttemptAnswerDetail {
+  questionId: string;
+  questionText: string;
+  questionType: QuestionType;
+  options: { id: string; text: string }[];
+  correctOptionIds: string[];
+  selectedOptionIds: string[];
+  awardedPoints: number;
+  maxPoints: number;
+  isCorrect: boolean;
+}
+
+/** Instructor-facing detail for one candidate's submitted attempt. */
+export interface InstructorAttemptDetail {
+  attemptId: string;
+  quizId: string;
+  quizTitle: string;
+  candidateId: string;
+  candidateName: string;
+  candidateEmail: string;
+  rank: number;
+  score: number;
+  maxScore: number;
+  percentage: number;
+  remark: string;
+  correctCount: number;
+  totalQuestions: number;
+  timeTakenSeconds: number;
+  status: AttemptStatus;
+  startedAt: string | null;
+  submittedAt: string | null;
+  answers: AttemptAnswerDetail[];
 }
 
 /** Score distribution bucket for charts. */

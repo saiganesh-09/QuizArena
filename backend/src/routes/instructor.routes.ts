@@ -28,7 +28,10 @@ import {
 } from '../schemas/instructor.schema';
 import { instructorResultsQuerySchema } from '../schemas/result.schema';
 import { editQuizSchema } from '../schemas/quiz.schema';
-import { getInstructorResultsHandler } from '../controllers/result.controller';
+import {
+  getInstructorResultsHandler,
+  getInstructorAttemptDetailHandler,
+} from '../controllers/result.controller';
 
 /**
  * Instructor routes — every route is locked behind:
@@ -85,6 +88,11 @@ router.get(
   requireQuizOwnership,
   validateQuery(instructorResultsQuerySchema),
   getInstructorResultsHandler,
+);
+router.get(
+  '/quizzes/:id/results/:attemptId',
+  requireQuizOwnership,
+  getInstructorAttemptDetailHandler,
 );
 
 export default router;

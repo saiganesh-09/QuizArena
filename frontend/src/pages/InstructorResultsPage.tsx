@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Breadcrumbs } from '@/components/atoms/Breadcrumbs';
 import { InstructorResultsDashboard } from '@/components/organisms/InstructorResultsDashboard';
+import { CandidateResultDetailModal } from '@/components/organisms/CandidateResultDetailModal';
 import { useGetInstructorResultsQuery } from '@/store/api/resultsApi';
 import type { CandidateResultRow } from '@/types/quiz';
 import './InstructorResultsPage.scss';
@@ -16,6 +17,7 @@ export function InstructorResultsPage(): JSX.Element {
 
   const [page, setPage] = useState<number>(1);
   const [search, setSearch] = useState<string>('');
+  const [selectedAttemptId, setSelectedAttemptId] = useState<string | null>(null);
 
   const { data: results, isLoading } = useGetInstructorResultsQuery(
     { quizId: id, page, limit: 10, search, sortBy: 'score', sortOrder: 'desc' },
@@ -27,9 +29,12 @@ export function InstructorResultsPage(): JSX.Element {
     setPage(1);
   }, []);
 
-  const handleViewDetails = useCallback((_row: CandidateResultRow) => {
-    // Viewing a specific candidate's detailed answers is a future
-    // enhancement. For now, this is a no-op placeholder.
+  const handleViewDetails = useCallback((row: CandidateResultRow) => {
+    setSelectedAttemptId(row.attemptId);
+  }, []);
+
+  const handleCloseDetail = useCallback(() => {
+    setSelectedAttemptId(null);
   }, []);
 
   if (!results) {
@@ -62,6 +67,12 @@ export function InstructorResultsPage(): JSX.Element {
         onPageChange={setPage}
         onSearchChange={handleSearchChange}
         onViewDetails={handleViewDetails}
+      />
+
+      <CandidateResultDetailModal
+        quizId={id}
+        attemptId={selectedAttemptId}
+        onClose={handleCloseDetail}
       />
     </div>
   );

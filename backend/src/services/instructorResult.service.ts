@@ -4,6 +4,7 @@ import { User } from '../models/User';
 import { AppError } from '../utils/AppError';
 import type {
   InstructorQuizResults,
+  InstructorAttemptDetail,
   CandidateResultRow,
   ScoreBucket,
   AttemptStatus,
@@ -113,14 +114,19 @@ export async function getInstructorQuizResults(
   }
 
   // Build the full candidate rows list (before pagination).
+  // Rank is competition ranking over ALL submitted attempts for this quiz
+  // (rank = 1 + number of attempts with a strictly higher score), so it is
+  // stable regardless of search filters, sorting, or pagination.
   const allRows: CandidateResultRow[] = allAttempts.map((a) => {
     const user = userMap.get(a.candidateId.toString());
     const percentage = a.maxScore > 0 ? Math.round((a.score / a.maxScore) * 100) : 0;
+    const rank = 1 + allAttempts.filter((other) => other.score > a.score).length;
     return {
       attemptId: a._id.toString(),
       candidateId: a.candidateId.toString(),
       candidateName: user?.name ?? 'Unknown',
       candidateEmail: user?.email ?? '',
+      rank,
       score: a.score,
       maxScore: a.maxScore,
       percentage,
@@ -195,5 +201,91 @@ export async function getInstructorQuizResults(
     page,
     limit: query.limit,
     totalPages,
+  };
+}
+
+/**
+ * Get one candidate's submitted attempt in detail, scoped to the calling
+ * instructor's quiz. Includes per-question scoring and correct answers —
+ * safe because the instructor owns the quiz content.
+ *
+ * @param instructorId  The authenticated instructor's user ID.
+ * @param quizId        The quiz ID from the route params.
+ * @param attemptId     The attempt ID from the route params.
+ */
+export async function getInstructorAttemptDetail(
+  instructorId: string,
+  quizId: string,
+  attemptId: string,
+): Promise<InstructorAttemptDetail> {
+  const quiz = await QuizModel.findById(quizId).exec();
+  if (!quiz) {
+    throw AppError.notFound('Quiz not found.');
+  }
+  if (!quiz.isOwnedBy(instructorId)) {
+    throw AppError.forbidden('You do not own this quiz.');
+  }
+
+  const attempt = await AttemptModel.findOne({
+    _id: attemptId,
+    quizId: quiz._id,
+    status: { $in: ['submitted', 'auto-submitted'] as AttemptStatus[] },
+  }).exec();
+  if (!attempt) {
+    throw AppError.notFound('Submitted attempt not found.');
+  }
+
+  const user = await User.findById(attempt.candidateId).exec();
+
+  // Rank among all submitted attempts (same competition ranking as the list).
+  const higher = await AttemptModel.countDocuments({
+    quizId: quiz._id,
+    status: { $in: ['submitted', 'auto-submitted'] as AttemptStatus[] },
+    score: { $gt: attempt.score },
+  }).exec();
+  const rank = higher + 1;
+
+  const percentage = attempt.maxScore > 0
+    ? Math.round((attempt.score / attempt.maxScore) * 100)
+    : 0;
+
+  // Join each stored answer back to its question for display.
+  const questionMap = new Map(
+    (quiz.questions ?? []).map((q) => [q._id.toString(), q]),
+  );
+  const answers = (attempt.answers ?? []).map((a) => {
+    const q = questionMap.get(a.questionId.toString());
+    return {
+      questionId: a.questionId.toString(),
+      questionText: q?.text ?? '(question removed)',
+      questionType: q?.type ?? 'single-choice',
+      options: (q?.options ?? []).map((o) => ({ id: o.id, text: o.text })),
+      correctOptionIds: q?.correctOptionIds ?? [],
+      selectedOptionIds: a.selectedOptionIds ?? [],
+      awardedPoints: a.awardedPoints,
+      maxPoints: a.maxPoints,
+      isCorrect: a.isCorrect,
+    };
+  });
+
+  return {
+    attemptId: attempt._id.toString(),
+    quizId: quiz._id.toString(),
+    quizTitle: quiz.title,
+    candidateId: attempt.candidateId.toString(),
+    candidateName: user?.name ?? 'Unknown',
+    candidateEmail: user?.email ?? '',
+    rank,
+    score: attempt.score,
+    maxScore: attempt.maxScore,
+    percentage,
+    remark: remarkForPercentage(percentage),
+    correctCount: answers.filter((a) => a.isCorrect).length,
+    totalQuestions: answers.length,
+    timeTakenSeconds: computeTimeTaken(attempt.startedAt, attempt.submittedAt),
+    status: attempt.status,
+    startedAt: attempt.startedAt instanceof Date ? attempt.startedAt.toISOString() : null,
+    submittedAt: attempt.submittedAt instanceof Date ? attempt.submittedAt.toISOString() : null,
+    answers,
   };
 }

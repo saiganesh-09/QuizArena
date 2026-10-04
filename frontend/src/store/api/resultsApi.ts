@@ -3,6 +3,7 @@ import type { ApiResponse } from '@/types/auth';
 import type {
   CandidateResult,
   InstructorQuizResults,
+  InstructorAttemptDetail,
   AdminAnalytics,
 } from '@/types/quiz';
 import type {
@@ -17,6 +18,7 @@ import type {
 
 type CandidateResultResponse = ApiResponse<CandidateResult>;
 type InstructorResultsResponse = ApiResponse<InstructorQuizResults>;
+type InstructorAttemptDetailResponse = ApiResponse<InstructorAttemptDetail>;
 type AdminAnalyticsResponse = ApiResponse<AdminAnalytics>;
 
 function unwrap<T>(envelope: ApiResponse<T>): T {
@@ -60,6 +62,15 @@ export const resultsApi = authApi.injectEndpoints({
       ],
     }),
 
+    /** GET /instructor/quizzes/:id/results/:attemptId — per-candidate attempt detail. */
+    getInstructorAttemptDetail: builder.query<InstructorAttemptDetail, { quizId: string; attemptId: string }>({
+      query: ({ quizId, attemptId }) => `/instructor/quizzes/${quizId}/results/${attemptId}`,
+      transformResponse: (response: InstructorAttemptDetailResponse) => unwrap(response),
+      providesTags: (_result, _error, { attemptId }) => [
+        { type: 'Quiz', id: `attempt-detail-${attemptId}` },
+      ],
+    }),
+
     /** GET /admin/analytics — platform-wide analytics summary. */
     getAdminAnalytics: builder.query<AdminAnalytics, AdminAnalyticsQueryParams>({
       query: (params) => `/admin/analytics${buildQuery(toQueryParams(params))}`,
@@ -72,5 +83,6 @@ export const resultsApi = authApi.injectEndpoints({
 export const {
   useGetCandidateResultQuery,
   useGetInstructorResultsQuery,
+  useGetInstructorAttemptDetailQuery,
   useGetAdminAnalyticsQuery,
 } = resultsApi;

@@ -135,6 +135,21 @@
     &--poor { background-color: rgba(229, 72, 77, 0.15); color: #b91c1c; }
   }
 
+  &__rank {
+    display: inline-block;
+    min-width: 2rem;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+
+    &--gold { background-color: color-mix(in srgb, var(--qa-color-warning) 22%, transparent); color: var(--qa-color-warning); }
+    &--silver { background-color: var(--qa-color-surface-alt); color: var(--qa-color-muted); }
+    &--bronze { background-color: color-mix(in srgb, var(--qa-color-warning) 12%, transparent); color: var(--qa-color-warning); }
+    &--plain { color: var(--qa-color-muted); }
+  }
+
   &__status {
     font-size: 0.75rem;
     font-weight: 600;
