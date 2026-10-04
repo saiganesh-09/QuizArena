@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { ScoreRing } from '@/components/atoms/ScoreRing';
 import type { CandidatePerformance } from '@/types/quiz';
 import './CandidatePerformancePanel.scss';
@@ -14,6 +15,7 @@ export interface CandidatePerformancePanelProps {
 export function CandidatePerformancePanel({
   performance,
 }: CandidatePerformancePanelProps): JSX.Element {
+  const navigate = useNavigate();
   const {
     attemptsTaken,
     averagePercentage,
@@ -24,6 +26,8 @@ export function CandidatePerformancePanel({
     latestQuizTitle,
     trend,
   } = performance;
+
+  const latestPoint = trend.length > 0 ? trend[trend.length - 1] : null;
 
   return (
     <section className="qa-performance">
@@ -41,45 +45,58 @@ export function CandidatePerformancePanel({
 
           <div className="qa-performance__highlights">
             <div className="qa-performance__stat">
-              <span className="qa-performance__stat-value">{attemptsTaken}</span>
               <span className="qa-performance__stat-label">Quizzes taken</span>
+              <span className="qa-performance__stat-value">{attemptsTaken}</span>
             </div>
-            <div className="qa-performance__stat">
+            <div className="qa-performance__stat qa-performance__stat--best">
+              <span className="qa-performance__stat-label">Best score</span>
               <span className="qa-performance__stat-value">{bestPercentage}%</span>
-              <span className="qa-performance__stat-label">
-                Best score{bestQuizTitle ? ` · ${bestQuizTitle}` : ''}
-              </span>
+              <span className="qa-performance__stat-sub">{bestQuizTitle ?? ''}</span>
             </div>
-            <div className="qa-performance__stat">
+            <div className="qa-performance__stat qa-performance__stat--latest">
+              <span className="qa-performance__stat-label">Latest score</span>
+              <span className="qa-performance__stat-value">
+                {latestPoint ? `${latestPoint.percentage}%` : '—'}
+              </span>
+              <span className="qa-performance__stat-sub">{latestPoint?.quizTitle ?? ''}</span>
+            </div>
+            <div className="qa-performance__stat qa-performance__stat--rank">
+              <span className="qa-performance__stat-label">Latest rank</span>
               <span className="qa-performance__stat-value">
                 {latestRank !== null ? `#${latestRank}` : '—'}
               </span>
-              <span className="qa-performance__stat-label">
+              <span className="qa-performance__stat-sub">
                 {latestRankOutOf !== null
-                  ? `Rank of ${latestRankOutOf}${latestQuizTitle ? ` · ${latestQuizTitle}` : ''}`
-                  : 'Latest rank'}
+                  ? `of ${latestRankOutOf}${latestQuizTitle ? ` · ${latestQuizTitle}` : ''}`
+                  : ''}
               </span>
             </div>
           </div>
 
           <div className="qa-performance__trend">
-            <h3 className="qa-performance__trend-title">Score trend</h3>
+            <h3 className="qa-performance__trend-title">Score trend — click a bar to view the result</h3>
             <div className="qa-performance__trend-bars">
               {trend.map((point) => (
-                <div key={point.quizId} className="qa-performance__trend-row">
+                <button
+                  type="button"
+                  key={point.quizId}
+                  className="qa-performance__trend-row"
+                  title={`${point.quizTitle}: ${point.percentage}% — view result`}
+                  onClick={() => navigate(`/candidate/quizzes/${point.quizId}/result`)}
+                >
                   <span className="qa-performance__trend-label" title={point.quizTitle}>
                     {point.quizTitle}
                   </span>
-                  <div className="qa-performance__trend-track">
-                    <div
+                  <span className="qa-performance__trend-track">
+                    <span
                       className={`qa-performance__trend-bar qa-performance__trend-bar--${
                         point.percentage >= 80 ? 'high' : point.percentage >= 50 ? 'mid' : 'low'
                       }`}
                       style={{ width: `${Math.max(point.percentage, 4)}%` }}
                     />
-                  </div>
+                  </span>
                   <span className="qa-performance__trend-pct">{point.percentage}%</span>
-                </div>
+                </button>
               ))}
             </div>
           </div>
