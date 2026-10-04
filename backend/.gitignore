@@ -21,3 +21,6 @@ npm-debug.log*
 
 # Coverage
 coverage/
+
+.vercel
+.env*

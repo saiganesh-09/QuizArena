@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import type { UserRole, UserProfile, AccountStatus } from '../types/auth';
 
 /** Shape of a User document as stored in MongoDB. */

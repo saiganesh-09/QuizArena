@@ -20,6 +20,10 @@ import { handleMulterError } from './config/multer';
 export function createApp(): Express {
   const app = express();
 
+  // We run behind a single reverse proxy (Vercel/Railway) that sets
+  // X-Forwarded-For — required so express-rate-limit doesn't throw.
+  app.set('trust proxy', 1);
+
   // Security headers
   app.use(helmet());
 
