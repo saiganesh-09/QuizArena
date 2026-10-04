@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto';
-import { QuizModel, IQuizDocument, IQuestionDoc } from '../models/Quiz';
+import mongoose from 'mongoose';
+import { IQuizDocument, IQuestionDoc } from '../models/Quiz';
 import { AppError } from '../utils/AppError';
 import { parseCsvBuffer } from '../utils/csv';
 import { csvQuestionRowSchema } from '../schemas/instructor.schema';
@@ -61,7 +62,7 @@ export async function addQuestion(
   }
 
   const newQuestion: IQuestionDoc = {
-    _id: new (QuizModel.db as unknown as { Types: { ObjectId: new () => import('mongoose').Types.ObjectId } }).Types.ObjectId() as unknown as import('mongoose').Types.ObjectId,
+    _id: new mongoose.Types.ObjectId(),
     type: input.type,
     text: input.text,
     options: input.options.map((o) => ({ id: o.id, text: o.text })),
@@ -199,7 +200,7 @@ export async function bulkUploadQuestions(
     const correctOptionIds = correctNumbers.map((n) => options[n - 1].id);
 
     return {
-      _id: new (QuizModel.db as unknown as { Types: { ObjectId: new () => import('mongoose').Types.ObjectId } }).Types.ObjectId() as unknown as import('mongoose').Types.ObjectId,
+      _id: new mongoose.Types.ObjectId(),
       type: row.type as QuestionType,
       text: row.text,
       options,
