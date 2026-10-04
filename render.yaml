@@ -1,0 +1,44 @@
+# QuizArena — Render blueprint (free tier)
+#
+# Deploy: Render dashboard → New → Blueprint → point at this repo.
+# Creates: backend API web service. MongoDB lives on Atlas (M0 free) —
+# paste the connection string into MONGO_URI when prompted.
+# Frontend is deployed separately on Vercel.
+#
+# NOTE: service name becomes the subdomain (quizarena-api.onrender.com).
+# If Render assigns a different URL, update CLIENT_ORIGIN /
+# ALLOWED_ORIGINS in the dashboard — Render redeploys automatically.
+
+services:
+  - type: web
+    name: quizarena-api
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    # NODE_ENV=production would make `npm ci` skip devDeps — force them in
+    # so tsc is available at build time.
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /health/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false           # Atlas connection string — set in dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: JWT_COOKIE_NAME
+        value: qa_token
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: COOKIE_SAMESITE
+        value: none
+      - key: BCRYPT_COST
+        value: "12"
+      - key: CLIENT_ORIGIN
+        value: https://quizarena-ten-delta.vercel.app
+      - key: ALLOWED_ORIGINS
+        value: https://quizarena-ten-delta.vercel.app
