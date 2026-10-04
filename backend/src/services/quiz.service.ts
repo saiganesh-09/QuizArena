@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { QuizModel, IQuizDocument } from '../models/Quiz';
 import { User } from '../models/User';
 import { AppError } from '../utils/AppError';
@@ -46,15 +47,17 @@ async function computeQuizStats(): Promise<QuizStatusStats> {
   return stats;
 }
 
-/** Create a new quiz in Draft status. */
+/** Create a new quiz in Draft status. Optionally self-assign an instructor. */
 export async function createQuiz(
   input: CreateQuizInput,
   createdBy: string,
+  ownerInstructor?: { instructorId: string; instructorEmail: string },
 ): Promise<Quiz> {
   const quiz = await QuizModel.create({
     title: input.title,
     description: input.description ?? '',
     status: 'draft', // always starts as Draft
+    kind: input.kind ?? 'quiz',
     startTime: new Date(input.startTime),
     endTime: new Date(input.endTime),
     durationMinutes: input.durationMinutes,
@@ -62,7 +65,13 @@ export async function createQuiz(
     difficulty: input.difficulty ?? 'Easy',
     passingPoints: input.passingPoints ?? 0,
     createdBy,
-    instructors: [],
+    instructors: ownerInstructor
+      ? [{
+          instructorId: new mongoose.Types.ObjectId(ownerInstructor.instructorId),
+          instructorEmail: ownerInstructor.instructorEmail,
+          assignedAt: new Date(),
+        }]
+      : [],
     cancelledAt: null,
   });
   return quiz.toQuizObject();

@@ -59,6 +59,14 @@ export function CandidateResultView({ result, onBack }: CandidateResultViewProps
         </div>
       </div>
 
+      {/* Teacher's remark (when the instructor wrote one) */}
+      {result.teacherRemark ? (
+        <div className="qa-candidate-result__teacher-remark">
+          <span className="qa-candidate-result__teacher-remark-label">Teacher&apos;s remark</span>
+          <p className="qa-candidate-result__teacher-remark-text">{result.teacherRemark}</p>
+        </div>
+      ) : null}
+
       {/* Question-by-question review */}
       <div className="qa-candidate-result__review">
         <h2 className="qa-candidate-result__review-title">Question Review</h2>

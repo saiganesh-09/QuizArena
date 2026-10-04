@@ -2,3 +2,21 @@
   min-height: 100vh;
   background-color: var(--qa-color-bg, #f7f8fb);
 }
+
+/* Kind badge shown next to homework assignments in quiz tables. */
+.qa-kind-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.08rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+
+  &--homework {
+    color: var(--qa-color-primary);
+    background-color: rgba(79, 70, 229, 0.12);
+  }
+}

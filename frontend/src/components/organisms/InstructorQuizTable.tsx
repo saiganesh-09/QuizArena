@@ -105,6 +105,9 @@ export function InstructorQuizTable({
                   <tr key={quiz.id} className="qa-instructor-quiz-table__tr">
                     <td className="qa-instructor-quiz-table__td qa-instructor-quiz-table__td--title">
                       {quiz.title}
+                      {quiz.kind === 'homework' ? (
+                        <span className="qa-kind-badge qa-kind-badge--homework">Homework</span>
+                      ) : null}
                     </td>
                     <td className="qa-instructor-quiz-table__td">
                       <Badge status={quiz.status} />

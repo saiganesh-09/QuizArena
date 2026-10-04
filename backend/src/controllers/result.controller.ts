@@ -6,6 +6,7 @@ import {
 import {
   getInstructorQuizResults,
   getInstructorAttemptDetail,
+  gradeAttempt,
 } from '../services/instructorResult.service';
 import { getAdminAnalytics } from '../services/adminAnalytics.service';
 import { AppError } from '../utils/AppError';
@@ -17,7 +18,11 @@ import type {
   InstructorAttemptDetail,
   AdminAnalytics,
 } from '../types/quiz';
-import type { InstructorResultsQuery, AdminAnalyticsQuery } from '../schemas/result.schema';
+import type {
+  InstructorResultsQuery,
+  AdminAnalyticsQuery,
+  GradeAttemptInput,
+} from '../schemas/result.schema';
 
 /**
  * Result controllers for Milestone 6.
@@ -74,6 +79,21 @@ export function getInstructorAttemptDetailHandler(req: Request, res: Response, n
     try {
       if (!req.user?.sub) throw AppError.unauthorized('Authentication required');
       const result = await getInstructorAttemptDetail(req.user.sub, req.params.id, req.params.attemptId);
+      const body: ApiSuccessBody<InstructorAttemptDetail> = { success: true, data: result };
+      res.status(200).json(body);
+    } catch (err) {
+      next(err);
+    }
+  })();
+}
+
+/** PATCH /instructor/quizzes/:id/results/:attemptId/grade — manual grade/remark. */
+export function gradeAttemptHandler(req: Request, res: Response, next: NextFunction): void {
+  void (async () => {
+    try {
+      if (!req.user?.sub) throw AppError.unauthorized('Authentication required');
+      const input = req.body as GradeAttemptInput;
+      const result = await gradeAttempt(req.user.sub, req.params.id, req.params.attemptId, input);
       const body: ApiSuccessBody<InstructorAttemptDetail> = { success: true, data: result };
       res.status(200).json(body);
     } catch (err) {

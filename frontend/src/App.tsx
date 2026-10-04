@@ -20,6 +20,8 @@ import { CandidateDashboardPage } from '@/pages/CandidateDashboardPage';
 import { MyCandidateQuizzesPage } from '@/pages/MyCandidateQuizzesPage';
 import { QuizAttemptPage } from '@/pages/QuizAttemptPage';
 import { CandidateResultPage } from '@/pages/CandidateResultPage';
+import { CandidateHomeworkPage } from '@/pages/CandidateHomeworkPage';
+import { InstructorHomeworkPage } from '@/pages/InstructorHomeworkPage';
 import { InstructorResultsPage } from '@/pages/InstructorResultsPage';
 import { InstructorAnalyticsPage } from '@/pages/InstructorAnalyticsPage';
 import { AdminAnalyticsPage } from '@/pages/AdminAnalyticsPage';
@@ -104,6 +106,7 @@ export function App(): JSX.Element {
           <Route index element={<Navigate to="/instructor/dashboard" replace />} />
           <Route path="dashboard" element={<InstructorDashboardPage />} />
           <Route path="quizzes" element={<MyQuizzesPage />} />
+          <Route path="homework" element={<InstructorHomeworkPage />} />
           <Route path="quizzes/:id" element={<UpdateQuizPage />} />
           <Route path="quizzes/:id/results" element={<InstructorResultsPage />} />
           <Route path="analytics" element={<InstructorAnalyticsPage />} />
@@ -121,6 +124,7 @@ export function App(): JSX.Element {
           <Route index element={<Navigate to="/candidate/dashboard" replace />} />
           <Route path="dashboard" element={<CandidateDashboardPage />} />
           <Route path="quizzes" element={<MyCandidateQuizzesPage />} />
+          <Route path="homework" element={<CandidateHomeworkPage />} />
           <Route path="quizzes/:id/start" element={<QuizAttemptPage />} />
           <Route path="quizzes/:id/result" element={<CandidateResultPage />} />
         </Route>

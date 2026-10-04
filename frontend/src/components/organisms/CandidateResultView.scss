@@ -214,3 +214,27 @@
     font-style: italic;
   }
 }
+
+.qa-candidate-result {
+  &__teacher-remark {
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--qa-color-border);
+    border-left: 3px solid var(--qa-color-primary);
+    border-radius: 8px;
+    background-color: var(--qa-color-surface-alt);
+  }
+
+  &__teacher-remark-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--qa-color-muted);
+  }
+
+  &__teacher-remark-text {
+    margin: 0.3rem 0 0;
+    font-size: 0.9rem;
+    color: var(--qa-color-text);
+  }
+}

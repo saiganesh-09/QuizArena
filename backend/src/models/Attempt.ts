@@ -40,6 +40,10 @@ export interface IAttempt {
   answers: IScoredAnswerDoc[];
   score: number;
   maxScore: number;
+  /** Optional instructor-awarded score; when set, overrides `score` everywhere. */
+  scoreOverride: number | null;
+  /** Optional teacher's written remark for the candidate. */
+  teacherRemark: string;
   autoSubmitted: boolean;
 }
 
@@ -109,6 +113,8 @@ const attemptSchema = new Schema<IAttemptDocument, IAttemptModel>(
     answers: { type: [scoredAnswerSchema], default: [] },
     score: { type: Number, default: 0 },
     maxScore: { type: Number, default: 0 },
+    scoreOverride: { type: Number, default: null },
+    teacherRemark: { type: String, default: '' },
     autoSubmitted: { type: Boolean, default: false },
   },
   { timestamps: true },

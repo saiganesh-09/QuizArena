@@ -35,7 +35,9 @@ import type {
   AddParticipantInput,
   InstructorQuizListQuery,
 } from '../schemas/instructor.schema';
-import type { EditQuizInput } from '../schemas/quiz.schema';
+import { createQuiz } from '../services/quiz.service';
+import type { CreateQuizInput, EditQuizInput } from '../schemas/quiz.schema';
+import type { Quiz } from '../types/quiz';
 
 /**
  * Instructor controllers. All handlers assume:
@@ -44,6 +46,24 @@ import type { EditQuizInput } from '../schemas/quiz.schema';
  */
 
 // ---- Quiz list / detail / edit / cancel / delete / publish ----
+
+/** POST /instructor/quizzes — instructor creates a quiz/homework draft they own. */
+export function createMyQuiz(req: Request, res: Response, next: NextFunction): void {
+  void (async () => {
+    try {
+      if (!req.user?.sub) throw AppError.unauthorized('Authentication required');
+      const input = req.body as CreateQuizInput;
+      const quiz = await createQuiz(input, req.user.sub, {
+        instructorId: req.user.sub,
+        instructorEmail: req.user.email ?? '',
+      });
+      const body: ApiSuccessBody<Quiz> = { success: true, data: quiz };
+      res.status(201).json(body);
+    } catch (err) {
+      next(err);
+    }
+  })();
+}
 
 /** GET /instructor/quizzes */
 export function listMyQuizzes(req: Request, res: Response, next: NextFunction): void {

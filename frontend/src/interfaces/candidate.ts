@@ -9,6 +9,8 @@ export interface CandidateQuizListQuery {
   page?: number;
   limit?: number;
   filter?: CandidateQuizFilter;
+  /** 'homework' lists only homework assignments. */
+  kind?: 'quiz' | 'homework';
   search?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';

@@ -32,6 +32,9 @@ function buildAssignedFilter(
   const filter: Record<string, unknown> = {
     'participants.userId': candidateId,
   };
+  if (query.kind) {
+    filter.kind = query.kind;
+  }
 
   // Candidate-facing status filter.
   // - upcoming: scheduled (not yet live)

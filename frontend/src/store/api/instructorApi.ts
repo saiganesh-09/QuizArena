@@ -3,6 +3,7 @@ import type { ApiResponse } from '@/types/auth';
 import type {
   InstructorQuiz,
   InstructorQuizListPayload,
+  Quiz,
   Question,
   Participant,
   BulkUploadResult,
@@ -13,6 +14,7 @@ import type {
   AddParticipantFormValues,
 } from '@/interfaces/instructor';
 import type { QuizFormValues } from '@/interfaces/quiz';
+import type { QuizKind } from '@/types/quiz';
 import { fromDateTimeLocalValue } from '@/utils/date';
 
 /**
@@ -23,6 +25,7 @@ import { fromDateTimeLocalValue } from '@/utils/date';
  */
 
 type InstructorQuizResponse = ApiResponse<InstructorQuiz>;
+type QuizResponse = ApiResponse<Quiz>;
 type InstructorQuizListResponse = ApiResponse<InstructorQuizListPayload>;
 type QuestionResponse = ApiResponse<Question>;
 type QuestionListResponse = ApiResponse<Question[]>;
@@ -66,6 +69,23 @@ export const instructorApi = authApi.injectEndpoints({
       query: (arg) => `/instructor/quizzes${toQueryString((arg ?? {}) as Record<string, unknown>)}`,
       transformResponse: (response: InstructorQuizListResponse) => unwrap(response),
       providesTags: [{ type: 'Quiz', id: 'instructor-list' }],
+    }),
+
+    /** POST /instructor/quizzes — create a quiz/homework draft (auto-owned). */
+    createMyQuiz: builder.mutation<
+      Quiz,
+      {
+        title: string;
+        description: string;
+        startTime: string;
+        endTime: string;
+        durationMinutes: number;
+        kind?: QuizKind;
+      }
+    >({
+      query: (body) => ({ url: '/instructor/quizzes', method: 'POST', body }),
+      transformResponse: (response: QuizResponse) => unwrap(response),
+      invalidatesTags: [{ type: 'Quiz', id: 'instructor-list' }],
     }),
 
     getMyQuiz: builder.query<InstructorQuiz, string>({
@@ -239,6 +259,7 @@ export const instructorApi = authApi.injectEndpoints({
 
 export const {
   useListMyQuizzesQuery,
+  useCreateMyQuizMutation,
   useGetMyQuizQuery,
   useEditMyQuizMutation,
   useCancelMyQuizMutation,

@@ -8,6 +8,9 @@ import type { UserRole, AccountStatus } from './auth';
 /** Quiz lifecycle states. */
 export type QuizStatus = 'draft' | 'scheduled' | 'live' | 'completed' | 'cancelled';
 
+/** 'quiz' = scheduled assessment; 'homework' = daily assignment (min 10 questions). */
+export type QuizKind = 'quiz' | 'homework';
+
 /** A single instructor assignment reference. */
 export interface InstructorAssignment {
   instructorId: string;
@@ -21,6 +24,7 @@ export interface Quiz {
   title: string;
   description: string;
   status: QuizStatus;
+  kind: QuizKind;
   startTime: string;
   endTime: string;
   durationMinutes: number;
@@ -170,6 +174,7 @@ export interface CandidateQuizMeta {
   title: string;
   description: string;
   status: QuizStatus;
+  kind: QuizKind;
   startTime: string;
   endTime: string;
   durationMinutes: number;
@@ -286,6 +291,8 @@ export interface CandidateResult {
   startedAt: string;
   submittedAt: string | null;
   autoSubmitted: boolean;
+  /** Teacher's written remark shown to the candidate (empty when unset). */
+  teacherRemark: string;
   questions: QuestionReview[];
 }
 
@@ -321,6 +328,7 @@ export interface CandidateResultRow {
   maxScore: number;
   percentage: number;
   remark: string;
+  teacherRemark: string;
   timeTakenSeconds: number;
   status: AttemptStatus;
   submittedAt: string | null;
@@ -352,6 +360,7 @@ export interface InstructorAttemptDetail {
   maxScore: number;
   percentage: number;
   remark: string;
+  teacherRemark: string;
   correctCount: number;
   totalQuestions: number;
   timeTakenSeconds: number;

@@ -28,6 +28,10 @@ export function InstructorSidebar(): JSX.Element {
           <span className="qa-instructor-sidebar__icon" aria-hidden="true">📋</span>
           My Quizzes
         </NavLink>
+        <NavLink to="/instructor/homework" className={linkClass}>
+          <span className="qa-instructor-sidebar__icon" aria-hidden="true">📝</span>
+          Homework
+        </NavLink>
         <NavLink to="/instructor/analytics" className={linkClass}>
           <span className="qa-instructor-sidebar__icon" aria-hidden="true">📊</span>
           Analytics

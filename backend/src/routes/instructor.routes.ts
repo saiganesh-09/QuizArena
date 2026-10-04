@@ -4,6 +4,7 @@ import { requireQuizOwnership } from '../middlewares/requireQuizOwnership';
 import { validateBody, validateQuery } from '../middlewares/validate';
 import { csvUpload } from '../config/multer';
 import {
+  createMyQuiz,
   listMyQuizzes,
   getMyQuiz,
   editMyQuiz,
@@ -26,11 +27,12 @@ import {
   addParticipantSchema,
   instructorQuizListQuerySchema,
 } from '../schemas/instructor.schema';
-import { instructorResultsQuerySchema } from '../schemas/result.schema';
-import { editQuizSchema } from '../schemas/quiz.schema';
+import { instructorResultsQuerySchema, gradeAttemptSchema } from '../schemas/result.schema';
+import { createQuizSchema, editQuizSchema } from '../schemas/quiz.schema';
 import {
   getInstructorResultsHandler,
   getInstructorAttemptDetailHandler,
+  gradeAttemptHandler,
 } from '../controllers/result.controller';
 
 /**
@@ -47,8 +49,9 @@ const router = Router();
 // Every /instructor/* route requires authentication + instructor role.
 router.use(requireAuth, requireRole('instructor'));
 
-// ---- Quiz list (no :id, no ownership guard) ----
+// ---- Quiz list / create (no :id, no ownership guard) ----
 router.get('/quizzes', validateQuery(instructorQuizListQuerySchema), listMyQuizzes);
+router.post('/quizzes', validateBody(createQuizSchema), createMyQuiz);
 
 // ---- Quiz-scoped routes (require ownership) ----
 router.get('/quizzes/:id', requireQuizOwnership, getMyQuiz);
@@ -93,6 +96,12 @@ router.get(
   '/quizzes/:id/results/:attemptId',
   requireQuizOwnership,
   getInstructorAttemptDetailHandler,
+);
+router.patch(
+  '/quizzes/:id/results/:attemptId/grade',
+  requireQuizOwnership,
+  validateBody(gradeAttemptSchema),
+  gradeAttemptHandler,
 );
 
 export default router;

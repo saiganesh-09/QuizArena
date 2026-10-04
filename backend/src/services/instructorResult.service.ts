@@ -9,7 +9,7 @@ import type {
   ScoreBucket,
   AttemptStatus,
 } from '../types/quiz';
-import type { InstructorResultsQuery } from '../schemas/result.schema';
+import type { InstructorResultsQuery, GradeAttemptInput } from '../schemas/result.schema';
 
 /**
  * Instructor results service.
@@ -62,6 +62,11 @@ function computeTimeTaken(startedAt: unknown, submittedAt: unknown): number {
   return Math.max(0, Math.round((e - s) / 1000));
 }
 
+/** The score shown to instructors/candidates: override wins when set. */
+function effectiveScore(a: { score: number; scoreOverride: number | null }): number {
+  return a.scoreOverride ?? a.score;
+}
+
 /**
  * Get aggregated results for a quiz, scoped to the calling instructor.
  *
@@ -94,15 +99,18 @@ export async function getInstructorQuizResults(
     status: { $in: ['submitted', 'auto-submitted'] as AttemptStatus[] },
   }).exec();
 
-  // Aggregate metrics from STORED scores (never re-derived).
+  // Aggregate metrics from STORED scores (never re-derived). An
+  // instructor's manual override supersedes the auto-graded score.
   const totalCompleted = allAttempts.length;
-  const scores = allAttempts.map((a) => a.score);
+  const scores = allAttempts.map(effectiveScore);
   const sumScore = scores.reduce((acc, s) => acc + s, 0);
   const averageScore = totalCompleted > 0 ? Math.round((sumScore / totalCompleted) * 100) / 100 : 0;
   const highestScore = totalCompleted > 0 ? Math.max(...scores) : 0;
   const lowestScore = totalCompleted > 0 ? Math.min(...scores) : 0;
   const completionRate = totalAssigned > 0 ? Math.round((totalCompleted / totalAssigned) * 100) : 0;
-  const scoreDistribution = buildScoreDistribution(allAttempts);
+  const scoreDistribution = buildScoreDistribution(
+    allAttempts.map((a) => ({ score: effectiveScore(a), maxScore: a.maxScore })),
+  );
 
   // Build candidate result rows with user info (join with User collection).
   // We fetch all matching users in one query for efficiency.
@@ -119,18 +127,20 @@ export async function getInstructorQuizResults(
   // stable regardless of search filters, sorting, or pagination.
   const allRows: CandidateResultRow[] = allAttempts.map((a) => {
     const user = userMap.get(a.candidateId.toString());
-    const percentage = a.maxScore > 0 ? Math.round((a.score / a.maxScore) * 100) : 0;
-    const rank = 1 + allAttempts.filter((other) => other.score > a.score).length;
+    const score = effectiveScore(a);
+    const percentage = a.maxScore > 0 ? Math.round((score / a.maxScore) * 100) : 0;
+    const rank = 1 + allAttempts.filter((other) => effectiveScore(other) > score).length;
     return {
       attemptId: a._id.toString(),
       candidateId: a.candidateId.toString(),
       candidateName: user?.name ?? 'Unknown',
       candidateEmail: user?.email ?? '',
       rank,
-      score: a.score,
+      score,
       maxScore: a.maxScore,
       percentage,
-      remark: remarkForPercentage(percentage),
+      remark: a.teacherRemark?.trim() || remarkForPercentage(percentage),
+      teacherRemark: a.teacherRemark ?? '',
       timeTakenSeconds: computeTimeTaken(a.startedAt, a.submittedAt),
       status: a.status,
       submittedAt: a.submittedAt instanceof Date ? a.submittedAt.toISOString() : null,
@@ -237,16 +247,19 @@ export async function getInstructorAttemptDetail(
 
   const user = await User.findById(attempt.candidateId).exec();
 
-  // Rank among all submitted attempts (same competition ranking as the list).
-  const higher = await AttemptModel.countDocuments({
+  // Rank among all submitted attempts (same competition ranking as the
+  // list), evaluated on effective scores so overrides are respected.
+  const score = effectiveScore(attempt);
+  const cohort = await AttemptModel.find({
     quizId: quiz._id,
     status: { $in: ['submitted', 'auto-submitted'] as AttemptStatus[] },
-    score: { $gt: attempt.score },
-  }).exec();
-  const rank = higher + 1;
+  })
+    .select('score scoreOverride')
+    .exec();
+  const rank = 1 + cohort.filter((o) => effectiveScore(o) > score).length;
 
   const percentage = attempt.maxScore > 0
-    ? Math.round((attempt.score / attempt.maxScore) * 100)
+    ? Math.round((score / attempt.maxScore) * 100)
     : 0;
 
   // Join each stored answer back to its question for display.
@@ -276,10 +289,11 @@ export async function getInstructorAttemptDetail(
     candidateName: user?.name ?? 'Unknown',
     candidateEmail: user?.email ?? '',
     rank,
-    score: attempt.score,
+    score,
     maxScore: attempt.maxScore,
     percentage,
-    remark: remarkForPercentage(percentage),
+    remark: attempt.teacherRemark?.trim() || remarkForPercentage(percentage),
+    teacherRemark: attempt.teacherRemark ?? '',
     correctCount: answers.filter((a) => a.isCorrect).length,
     totalQuestions: answers.length,
     timeTakenSeconds: computeTimeTaken(attempt.startedAt, attempt.submittedAt),
@@ -288,4 +302,46 @@ export async function getInstructorAttemptDetail(
     submittedAt: attempt.submittedAt instanceof Date ? attempt.submittedAt.toISOString() : null,
     answers,
   };
+}
+
+/**
+ * Manually grade a candidate's submitted attempt: an optional score
+ * override and/or a teacher remark. The original auto-graded `score`
+ * stays on the document — `scoreOverride` supersedes it on every read.
+ */
+export async function gradeAttempt(
+  instructorId: string,
+  quizId: string,
+  attemptId: string,
+  input: GradeAttemptInput,
+): Promise<InstructorAttemptDetail> {
+  const quiz = await QuizModel.findById(quizId).exec();
+  if (!quiz) {
+    throw AppError.notFound('Quiz not found.');
+  }
+  if (!quiz.isOwnedBy(instructorId)) {
+    throw AppError.forbidden('You do not own this quiz.');
+  }
+
+  const attempt = await AttemptModel.findOne({
+    _id: attemptId,
+    quizId: quiz._id,
+    status: { $in: ['submitted', 'auto-submitted'] as AttemptStatus[] },
+  }).exec();
+  if (!attempt) {
+    throw AppError.notFound('Submitted attempt not found.');
+  }
+
+  if (input.score !== undefined) {
+    if (input.score > attempt.maxScore) {
+      throw AppError.badRequest(`Score cannot exceed the maximum ${attempt.maxScore}.`);
+    }
+    attempt.scoreOverride = input.score;
+  }
+  if (input.teacherRemark !== undefined) {
+    attempt.teacherRemark = input.teacherRemark;
+  }
+  await attempt.save();
+
+  return getInstructorAttemptDetail(instructorId, quizId, attemptId);
 }

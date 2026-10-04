@@ -15,6 +15,21 @@ export const instructorResultsQuerySchema = z.object({
 export type InstructorResultsQuery = z.infer<typeof instructorResultsQuerySchema>;
 
 /**
+ * Zod validation schema for instructor manual grading of a submitted
+ * attempt — an optional score override and/or a teacher remark.
+ */
+export const gradeAttemptSchema = z
+  .object({
+    score: z.number().int().min(0, 'Score cannot be negative').optional(),
+    teacherRemark: z.string().trim().max(500, 'Remark is too long').optional(),
+  })
+  .refine((d) => d.score !== undefined || d.teacherRemark !== undefined, {
+    message: 'Provide a score or a remark (or both)',
+  });
+
+export type GradeAttemptInput = z.infer<typeof gradeAttemptSchema>;
+
+/**
  * Zod validation schema for the admin analytics query.
  * Supports optional date range and instructor filters.
  */

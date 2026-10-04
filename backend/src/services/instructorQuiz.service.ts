@@ -24,6 +24,7 @@ function buildFilter(instructorId: string, query: InstructorQuizListQuery): Reco
     'instructors.instructorId': instructorId,
   };
   if (query.status) filter.status = query.status;
+  if (query.kind) filter.kind = query.kind;
   if (query.search) {
     const escaped = query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     filter.$or = [

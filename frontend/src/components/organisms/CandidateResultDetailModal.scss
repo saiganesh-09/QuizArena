@@ -161,4 +161,24 @@
     &--miss { color: var(--qa-color-danger); }
     &--correct { color: var(--qa-color-success); font-weight: 600; }
   }
+
+  &__grade {
+    border-top: 1px solid var(--qa-color-border);
+    padding-top: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  &__grade-form {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.6rem;
+  }
+
+  &__grade-error {
+    font-size: 0.8rem;
+    color: var(--qa-color-danger);
+    margin: 0;
+  }
 }

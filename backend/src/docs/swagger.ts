@@ -115,6 +115,7 @@ export const swaggerSpec: OpenAPIV3.Document = {
           endTime: { type: 'string', format: 'date-time' },
           durationMinutes: { type: 'integer', minimum: 1, maximum: 300 },
           instructorId: { type: 'string', description: 'Admin-only: assign instructor' },
+          kind: { type: 'string', enum: ['quiz', 'homework'], default: 'quiz' },
         },
       },
       EditQuizRequest: {
@@ -565,10 +566,25 @@ export const swaggerSpec: OpenAPIV3.Document = {
           { name: 'limit', in: 'query', schema: { type: 'integer', default: 10 } },
           { name: 'search', in: 'query', schema: { type: 'string' } },
           { name: 'status', in: 'query', schema: { type: 'string' } },
+          { name: 'kind', in: 'query', schema: { type: 'string', enum: ['quiz', 'homework'] } },
         ],
         responses: {
           '200': { description: 'Paginated quiz list' },
           '401': { description: 'Not authenticated' },
+          '403': { description: 'Not an instructor' },
+        },
+      },
+      post: {
+        tags: ['Instructor'],
+        summary: 'Create a quiz or homework draft owned by the instructor (kind=homework requires >= 10 questions to publish)',
+        security: [{ cookieAuth: [] }],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateQuizRequest' } } },
+        },
+        responses: {
+          '201': { description: 'Draft created, instructor auto-assigned' },
+          '400': { description: 'Validation error' },
           '403': { description: 'Not an instructor' },
         },
       },
@@ -726,6 +742,37 @@ export const swaggerSpec: OpenAPIV3.Document = {
         ],
         responses: {
           '200': { description: 'Attempt detail', content: { 'application/json': { schema: { $ref: '#/components/schemas/InstructorAttemptDetail' } } } },
+          '403': { description: 'Not the owner' },
+          '404': { description: 'Quiz or submitted attempt not found' },
+        },
+      },
+    },
+    '/instructor/quizzes/{id}/results/{attemptId}/grade': {
+      patch: {
+        tags: ['Instructor'],
+        summary: 'Manually grade an attempt — score override and/or teacher remark',
+        security: [{ cookieAuth: [] }],
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
+          { name: 'attemptId', in: 'path', required: true, schema: { type: 'string' } },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  score: { type: 'integer', minimum: 0 },
+                  teacherRemark: { type: 'string', maxLength: 500 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: 'Updated attempt detail', content: { 'application/json': { schema: { $ref: '#/components/schemas/InstructorAttemptDetail' } } } },
+          '400': { description: 'Validation error (e.g. score exceeds max)' },
           '403': { description: 'Not the owner' },
           '404': { description: 'Quiz or submitted attempt not found' },
         },

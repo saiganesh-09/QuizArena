@@ -13,6 +13,7 @@ export interface InstructorQuizListQuery {
   page?: number;
   limit?: number;
   status?: string;
+  kind?: 'quiz' | 'homework';
   search?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';

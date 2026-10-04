@@ -88,10 +88,12 @@ export async function getCandidateResult(
   });
 
   // Calculate derived display values from STORED scores (not re-graded).
+  // An instructor's manual override supersedes the auto-graded score.
   const correctCount = (attempt.answers ?? []).filter((a) => a.isCorrect).length;
   const totalQuestions = (quiz.questions ?? []).length;
+  const score = attempt.scoreOverride ?? attempt.score;
   const percentage = attempt.maxScore > 0
-    ? Math.round((attempt.score / attempt.maxScore) * 100)
+    ? Math.round((score / attempt.maxScore) * 100)
     : 0;
 
   // Time taken: from startedAt to submittedAt (clamped if null).
@@ -104,7 +106,7 @@ export async function getCandidateResult(
     quizId: attempt.quizId.toString(),
     quizTitle: attempt.quizTitle,
     status: attempt.status,
-    score: attempt.score,
+    score,
     maxScore: attempt.maxScore,
     percentage,
     correctCount,
@@ -113,6 +115,7 @@ export async function getCandidateResult(
     startedAt: attempt.startedAt instanceof Date ? attempt.startedAt.toISOString() : '',
     submittedAt: attempt.submittedAt instanceof Date ? attempt.submittedAt.toISOString() : null,
     autoSubmitted: attempt.autoSubmitted,
+    teacherRemark: attempt.teacherRemark ?? '',
     questions,
   };
 }
@@ -142,12 +145,15 @@ export async function getCandidatePerformance(
       const tb = b.submittedAt instanceof Date ? b.submittedAt.getTime() : 0;
       return ta - tb;
     })
-    .map((a) => ({
-      quizId: a.quizId.toString(),
-      quizTitle: a.quizTitle,
-      percentage: a.maxScore > 0 ? Math.round((a.score / a.maxScore) * 100) : 0,
-      submittedAt: a.submittedAt instanceof Date ? a.submittedAt.toISOString() : null,
-    }));
+    .map((a) => {
+      const score = a.scoreOverride ?? a.score;
+      return {
+        quizId: a.quizId.toString(),
+        quizTitle: a.quizTitle,
+        percentage: a.maxScore > 0 ? Math.round((score / a.maxScore) * 100) : 0,
+        submittedAt: a.submittedAt instanceof Date ? a.submittedAt.toISOString() : null,
+      };
+    });
 
   const attemptsTaken = points.length;
   const percentages = points.map((p) => p.percentage);
@@ -179,7 +185,11 @@ export async function getCandidatePerformance(
       status: { $in: ['submitted', 'auto-submitted'] as AttemptStatus[] },
     };
     const [higher, total] = await Promise.all([
-      AttemptModel.countDocuments({ ...cohortFilter, score: { $gt: latest.score } }).exec(),
+      // Rank uses effective scores: a stored override supersedes the raw score.
+      AttemptModel.countDocuments({
+        ...cohortFilter,
+        $expr: { $gt: [{ $ifNull: ['$scoreOverride', '$score'] }, latest.scoreOverride ?? latest.score] },
+      }).exec(),
       AttemptModel.countDocuments(cohortFilter).exec(),
     ]);
     latestRank = higher + 1;

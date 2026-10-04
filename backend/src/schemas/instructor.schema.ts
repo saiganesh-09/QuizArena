@@ -99,6 +99,7 @@ export const instructorQuizListQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
   status: z.enum(['draft', 'scheduled', 'live', 'completed', 'cancelled']).optional(),
+  kind: z.enum(['quiz', 'homework']).optional(),
   search: z.string().trim().optional(),
   sortBy: z.enum(['title', 'status', 'startTime', 'endTime', 'createdAt', 'updatedAt']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),

@@ -1,7 +1,10 @@
+import { useEffect, useState } from 'react';
 import { Modal } from '@/components/atoms/Modal';
 import { ScoreRing } from '@/components/atoms/ScoreRing';
 import { Spinner } from '@/components/atoms/Spinner';
-import { useGetInstructorAttemptDetailQuery } from '@/store/api/resultsApi';
+import { Input } from '@/components/atoms/Input';
+import { Button } from '@/components/atoms/Button';
+import { useGetInstructorAttemptDetailQuery, useGradeAttemptMutation } from '@/store/api/resultsApi';
 import { formatDuration } from '@/interfaces/results';
 import { formatDateTime } from '@/utils/date';
 import './CandidateResultDetailModal.scss';
@@ -27,6 +30,31 @@ export function CandidateResultDetailModal({
     { quizId, attemptId: attemptId ?? '' },
     { skip: !attemptId },
   );
+  const [gradeAttempt, { isLoading: isSaving }] = useGradeAttemptMutation();
+
+  const [gradeScore, setGradeScore] = useState<string>('');
+  const [gradeRemark, setGradeRemark] = useState<string>('');
+  const [gradeError, setGradeError] = useState<string>('');
+
+  // Sync the form whenever a different attempt loads.
+  useEffect(() => {
+    setGradeScore(data ? String(data.score) : '');
+    setGradeRemark(data?.teacherRemark ?? '');
+    setGradeError('');
+  }, [data?.attemptId, data]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSaveGrade = (): void => {
+    if (!attemptId || !data) return;
+    setGradeError('');
+    const score = gradeScore.trim() === '' ? undefined : parseInt(gradeScore, 10);
+    if (score !== undefined && (!Number.isFinite(score) || score < 0 || score > data.maxScore)) {
+      setGradeError(`Score must be between 0 and ${data.maxScore}.`);
+      return;
+    }
+    void gradeAttempt({ quizId, attemptId, score, teacherRemark: gradeRemark.trim() })
+      .unwrap()
+      .catch(() => setGradeError('Could not save the grade. Please try again.'));
+  };
 
   return (
     <Modal open={attemptId !== null} title="Candidate Performance" onClose={onClose}>
@@ -90,6 +118,28 @@ export function CandidateResultDetailModal({
                 </div>
               );
             })}
+          </div>
+
+          <div className="qa-cand-detail__grade">
+            <h3 className="qa-cand-detail__graph-title">Teacher grading</h3>
+            <div className="qa-cand-detail__grade-form">
+              <Input
+                label={`Score (0–${data.maxScore})`}
+                type="number"
+                value={gradeScore}
+                onChange={(e) => setGradeScore(e.target.value)}
+              />
+              <Input
+                label="Remark for student"
+                value={gradeRemark}
+                onChange={(e) => setGradeRemark(e.target.value)}
+                placeholder="e.g. Great effort — revise closures"
+              />
+            </div>
+            {gradeError ? <p className="qa-cand-detail__grade-error">{gradeError}</p> : null}
+            <Button variant="primary" onClick={handleSaveGrade} disabled={isSaving}>
+              {isSaving ? 'Saving…' : 'Save grade'}
+            </Button>
           </div>
         </div>
       )}

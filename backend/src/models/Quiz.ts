@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 import type {
   Quiz,
   QuizStatus,
+  QuizKind,
   Question,
   Participant,
   QuizReadiness,
@@ -58,6 +59,7 @@ export interface IQuiz {
   title: string;
   description: string;
   status: QuizStatus;
+  kind: QuizKind;
   startTime: Date;
   endTime: Date;
   durationMinutes: number;
@@ -126,6 +128,13 @@ const quizSchema = new Schema<IQuizDocument, IQuizModel>(
       type: String,
       enum: ['draft', 'scheduled', 'live', 'completed', 'cancelled'],
       default: 'draft',
+      required: true,
+      index: true,
+    },
+    kind: {
+      type: String,
+      enum: ['quiz', 'homework'],
+      default: 'quiz',
       required: true,
       index: true,
     },
@@ -254,17 +263,32 @@ quizSchema.methods.isOwnedBy = function isOwnedBy(instructorId: string): boolean
  * schedule window (startTime in the future, endTime after startTime).
  */
 quizSchema.methods.computeReadiness = function computeReadiness(): QuizReadiness {
-  const hasQuestions = (this.questions ?? []).length > 0;
+  const qCount = (this.questions ?? []).length;
   const hasParticipants = (this.participants ?? []).length > 0;
   const now = Date.now();
   const start = this.startTime instanceof Date ? this.startTime.getTime() : 0;
   const end = this.endTime instanceof Date ? this.endTime.getTime() : 0;
-  const hasUpcomingSchedule = start > now && end > start;
+
+  // Homework (daily assignments) may start immediately or already be in
+  // its window — the requirement is simply that the window has not closed.
+  // Regular quizzes still require an upcoming start.
+  const isHomework = this.kind === 'homework';
+  const minQuestions = isHomework ? 10 : 1;
+  const hasQuestions = qCount >= minQuestions;
+  const hasUpcomingSchedule = isHomework
+    ? end > now && end > start
+    : start > now && end > start;
 
   const missing: string[] = [];
-  if (!hasQuestions) missing.push('At least one question is required');
+  if (!hasQuestions) {
+    missing.push(isHomework ? 'Homework requires at least 10 questions' : 'At least one question is required');
+  }
   if (!hasParticipants) missing.push('At least one participant is required');
-  if (!hasUpcomingSchedule) missing.push('A valid upcoming schedule window is required (start time in the future, end after start)');
+  if (!hasUpcomingSchedule) {
+    missing.push(isHomework
+      ? 'A valid schedule window that has not ended is required'
+      : 'A valid upcoming schedule window is required (start time in the future, end after start)');
+  }
 
   return {
     ready: missing.length === 0,
@@ -299,6 +323,7 @@ quizSchema.methods.toCandidateMeta = function toCandidateMeta(): CandidateQuizMe
     title: this.title,
     description: this.description,
     status: this.status,
+    kind: this.kind,
     startTime: toIsoUtc(this.startTime),
     endTime: toIsoUtc(this.endTime),
     durationMinutes: this.durationMinutes,
@@ -339,6 +364,7 @@ quizSchema.methods.toQuizObject = function toQuizObject(): Quiz {
     title: this.title,
     description: this.description,
     status: this.status,
+    kind: this.kind,
     startTime: toIsoUtc(this.startTime),
     endTime: toIsoUtc(this.endTime),
     durationMinutes: this.durationMinutes,

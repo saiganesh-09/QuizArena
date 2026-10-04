@@ -10,6 +10,8 @@ export const candidateQuizListQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(10),
   /** Filter by candidate-facing category. */
   filter: z.enum(['upcoming', 'live', 'completed', 'all']).default('all'),
+  /** Filter by quiz kind — 'homework' for the Homework section. */
+  kind: z.enum(['quiz', 'homework']).optional(),
   search: z.string().trim().optional(),
   sortBy: z.enum(['title', 'status', 'startTime', 'endTime', 'createdAt']).default('startTime'),
   sortOrder: z.enum(['asc', 'desc']).default('asc'),

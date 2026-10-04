@@ -71,6 +71,23 @@ export const resultsApi = authApi.injectEndpoints({
       ],
     }),
 
+    /** PATCH /instructor/quizzes/:id/results/:attemptId/grade — manual grade/remark. */
+    gradeAttempt: builder.mutation<
+      InstructorAttemptDetail,
+      { quizId: string; attemptId: string; score?: number; teacherRemark?: string }
+    >({
+      query: ({ quizId, attemptId, ...body }) => ({
+        url: `/instructor/quizzes/${quizId}/results/${attemptId}/grade`,
+        method: 'PATCH',
+        body,
+      }),
+      transformResponse: (response: InstructorAttemptDetailResponse) => unwrap(response),
+      invalidatesTags: (_result, _error, { quizId, attemptId }) => [
+        { type: 'Quiz', id: `attempt-detail-${attemptId}` },
+        { type: 'Quiz', id: `instructor-results-${quizId}` },
+      ],
+    }),
+
     /** GET /admin/analytics — platform-wide analytics summary. */
     getAdminAnalytics: builder.query<AdminAnalytics, AdminAnalyticsQueryParams>({
       query: (params) => `/admin/analytics${buildQuery(toQueryParams(params))}`,
@@ -84,5 +101,6 @@ export const {
   useGetCandidateResultQuery,
   useGetInstructorResultsQuery,
   useGetInstructorAttemptDetailQuery,
+  useGradeAttemptMutation,
   useGetAdminAnalyticsQuery,
 } = resultsApi;

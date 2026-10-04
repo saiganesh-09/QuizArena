@@ -28,6 +28,7 @@ export const createQuizSchema = z
     level: z.enum(['Beginner', 'Intermediate', 'Advanced']).optional().default('Beginner'),
     difficulty: z.enum(['Easy', 'Medium', 'Hard']).optional().default('Easy'),
     passingPoints: z.number().int().min(0, 'Passing points cannot be negative').optional().default(0),
+    kind: z.enum(['quiz', 'homework']).optional().default('quiz'),
   })
   .refine((data) => new Date(data.endTime).getTime() > new Date(data.startTime).getTime(), {
     message: 'End time must be strictly after start time',
