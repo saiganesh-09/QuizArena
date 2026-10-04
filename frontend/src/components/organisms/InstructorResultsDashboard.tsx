@@ -113,6 +113,7 @@ export function InstructorResultsDashboard({
                     <th className="qa-instructor-results__th">Candidate</th>
                     <th className="qa-instructor-results__th">Score</th>
                     <th className="qa-instructor-results__th">Percentage</th>
+                    <th className="qa-instructor-results__th">Remarks</th>
                     <th className="qa-instructor-results__th">Time Taken</th>
                     <th className="qa-instructor-results__th">Status</th>
                     <th className="qa-instructor-results__th">Submitted</th>
@@ -134,6 +135,11 @@ export function InstructorResultsDashboard({
                       <td className="qa-instructor-results__td">
                         <span className={`qa-instructor-results__pct qa-instructor-results__pct--${row.percentage >= 80 ? 'high' : row.percentage >= 50 ? 'mid' : 'low'}`}>
                           {row.percentage}%
+                        </span>
+                      </td>
+                      <td className="qa-instructor-results__td">
+                        <span className={`qa-instructor-results__remark qa-instructor-results__remark--${row.percentage >= 80 ? 'excellent' : row.percentage >= 60 ? 'good' : row.percentage >= 40 ? 'average' : 'poor'}`}>
+                          {row.remark}
                         </span>
                       </td>
                       <td className="qa-instructor-results__td">{formatDuration(row.timeTakenSeconds)}</td>

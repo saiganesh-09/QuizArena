@@ -298,6 +298,7 @@ export interface CandidateResultRow {
   score: number;
   maxScore: number;
   percentage: number;
+  remark: string;
   timeTakenSeconds: number;
   status: AttemptStatus;
   submittedAt: string | null;

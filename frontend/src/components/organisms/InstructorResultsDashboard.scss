@@ -122,6 +122,19 @@
     &--low { background-color: rgba(229, 72, 77, 0.15); color: #b91c1c; }
   }
 
+  &__remark {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+
+    &--excellent { background-color: rgba(34, 197, 94, 0.15); color: #15803d; }
+    &--good { background-color: rgba(59, 130, 246, 0.15); color: #1d4ed8; }
+    &--average { background-color: rgba(245, 158, 11, 0.15); color: #b45309; }
+    &--poor { background-color: rgba(229, 72, 77, 0.15); color: #b91c1c; }
+  }
+
   &__status {
     font-size: 0.75rem;
     font-weight: 600;

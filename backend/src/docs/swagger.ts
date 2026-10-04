@@ -270,6 +270,7 @@ export const swaggerSpec: OpenAPIV3.Document = {
                 score: { type: 'integer' },
                 maxScore: { type: 'integer' },
                 percentage: { type: 'integer' },
+                remark: { type: 'string' },
                 timeTakenSeconds: { type: 'integer' },
                 status: { type: 'string' },
                 submittedAt: { type: 'string', format: 'date-time' },

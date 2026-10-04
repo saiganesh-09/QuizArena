@@ -46,6 +46,14 @@ function buildScoreDistribution(attempts: { score: number; maxScore: number }[])
   return buckets;
 }
 
+/** Map a score percentage to a human-readable remark band. */
+function remarkForPercentage(pct: number): string {
+  if (pct >= 80) return 'Excellent';
+  if (pct >= 60) return 'Good';
+  if (pct >= 40) return 'Average';
+  return 'Needs Improvement';
+}
+
 /** Compute time taken in seconds from an attempt's stored timestamps. */
 function computeTimeTaken(startedAt: unknown, submittedAt: unknown): number {
   const s = startedAt instanceof Date ? startedAt.getTime() : 0;
@@ -116,6 +124,7 @@ export async function getInstructorQuizResults(
       score: a.score,
       maxScore: a.maxScore,
       percentage,
+      remark: remarkForPercentage(percentage),
       timeTakenSeconds: computeTimeTaken(a.startedAt, a.submittedAt),
       status: a.status,
       submittedAt: a.submittedAt instanceof Date ? a.submittedAt.toISOString() : null,
