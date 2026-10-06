@@ -86,6 +86,7 @@ export async function listInstructorQuizzes(
     },
     {
       $project: {
+        quizId: 1,
         pct: {
           $cond: [
             { $gt: ['$maxScore', 0] },
@@ -97,7 +98,9 @@ export async function listInstructorQuizzes(
     },
     { $group: { _id: '$quizId', count: { $sum: 1 }, avgPct: { $avg: '$pct' } } },
   ]).exec();
-  const attemptMap = new Map(attemptAgg.map((a) => [a._id.toString(), a]));
+  const attemptMap = new Map(
+    attemptAgg.filter((a) => a._id != null).map((a) => [a._id.toString(), a]),
+  );
 
   return {
     items: docs.map((d: IQuizDocument) => {
