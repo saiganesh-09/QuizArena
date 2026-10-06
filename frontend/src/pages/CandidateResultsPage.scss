@@ -1,0 +1,113 @@
+.qa-results-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+
+  &__heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--qa-color-text);
+    margin: 0;
+  }
+
+  &__subheading {
+    color: var(--qa-color-muted);
+    margin: 0.25rem 0 0;
+  }
+
+  &__loading {
+    padding: 3rem;
+    text-align: center;
+    color: var(--qa-color-muted);
+  }
+
+  &__card {
+    border: 1px solid var(--qa-color-border);
+    border-radius: 10px;
+    background-color: var(--qa-color-surface);
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+
+    th {
+      text-align: left;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--qa-color-muted);
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid var(--qa-color-border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid var(--qa-color-border);
+      color: var(--qa-color-text);
+      white-space: nowrap;
+    }
+
+    tr:last-child td { border-bottom: none; }
+  }
+
+  &__th--right,
+  &__td--right { text-align: right; }
+
+  &__td--title {
+    font-weight: 600;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__rank {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-weight: 700;
+    background-color: var(--qa-color-surface-alt);
+    color: var(--qa-color-muted);
+
+    &--1 { background-color: rgba(234, 179, 8, 0.2); color: #a16207; }
+    &--2 { background-color: rgba(148, 163, 184, 0.25); color: #64748b; }
+    &--3 { background-color: rgba(217, 119, 6, 0.18); color: #b45309; }
+  }
+
+  &__of {
+    margin-left: 0.35rem;
+    font-size: 0.72rem;
+    color: var(--qa-color-muted);
+  }
+
+  &__remark {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+
+    &--excellent { background-color: rgba(34, 197, 94, 0.15); color: #15803d; }
+    &--good { background-color: rgba(59, 130, 246, 0.15); color: #1d4ed8; }
+    &--average { background-color: rgba(234, 179, 8, 0.18); color: #a16207; }
+    &--poor { background-color: rgba(239, 68, 68, 0.15); color: #b91c1c; }
+  }
+
+  &__view {
+    background: none;
+    border: none;
+    color: var(--qa-color-primary);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}

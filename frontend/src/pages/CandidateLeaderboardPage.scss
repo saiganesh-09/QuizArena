@@ -1,0 +1,140 @@
+.qa-leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+
+  &__heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--qa-color-text);
+    margin: 0;
+  }
+
+  &__subheading {
+    color: var(--qa-color-muted);
+    margin: 0.25rem 0 0;
+  }
+
+  &__me {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--qa-color-primary);
+    border-radius: 10px;
+    background-color: rgba(79, 140, 255, 0.08);
+  }
+
+  &__me-rank {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--qa-color-primary);
+  }
+
+  &__me-text {
+    font-size: 0.85rem;
+    color: var(--qa-color-text);
+  }
+
+  &__loading {
+    padding: 3rem;
+    text-align: center;
+    color: var(--qa-color-muted);
+  }
+
+  &__card {
+    border: 1px solid var(--qa-color-border);
+    border-radius: 10px;
+    background-color: var(--qa-color-surface);
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+
+    th {
+      text-align: left;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--qa-color-muted);
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid var(--qa-color-border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid var(--qa-color-border);
+      color: var(--qa-color-text);
+    }
+
+    tr:last-child td { border-bottom: none; }
+  }
+
+  &__row--self {
+    background-color: rgba(79, 140, 255, 0.07);
+
+    td { font-weight: 600; }
+  }
+
+  &__td-rank {
+    font-size: 1rem;
+    font-weight: 700;
+    width: 64px;
+  }
+
+  &__td-name { font-weight: 600; }
+
+  &__you {
+    margin-left: 0.45rem;
+    padding: 0.08rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: var(--qa-color-primary);
+    color: #fff;
+    vertical-align: middle;
+  }
+
+  &__avg {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 140px;
+  }
+
+  &__avg-track {
+    flex: 1;
+    height: 8px;
+    border-radius: 4px;
+    background-color: var(--qa-color-surface-alt);
+    overflow: hidden;
+    display: block;
+  }
+
+  &__avg-bar {
+    display: block;
+    height: 100%;
+    border-radius: 4px;
+    background-color: var(--qa-color-primary);
+    transition: width 0.4s ease;
+  }
+
+  &__avg-pct {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--qa-color-muted);
+    min-width: 36px;
+    text-align: right;
+  }
+}

@@ -13,6 +13,8 @@ import {
 import {
   getCandidateResultHandler,
   getCandidatePerformanceHandler,
+  getCandidateResultsHandler,
+  getCandidateLeaderboardHandler,
 } from '../controllers/result.controller';
 import { candidateQuizListQuerySchema } from '../schemas/candidate.schema';
 import { submitAnswersSchema } from '../schemas/attempt.schema';
@@ -34,6 +36,12 @@ router.use(requireAuth, requireRole('candidate'));
 
 // ---- Performance summary (own attempts only) ----
 router.get('/performance', getCandidatePerformanceHandler);
+
+// ---- Results history (own attempts only) ----
+router.get('/results', getCandidateResultsHandler);
+
+// ---- Leaderboard (aggregate names + stats across candidates) ----
+router.get('/leaderboard', getCandidateLeaderboardHandler);
 
 // ---- Quiz list (assignment-filtered) ----
 router.get('/quizzes', validateQuery(candidateQuizListQuerySchema), listCandidateQuizzesHandler);

@@ -21,6 +21,8 @@ import { MyCandidateQuizzesPage } from '@/pages/MyCandidateQuizzesPage';
 import { QuizAttemptPage } from '@/pages/QuizAttemptPage';
 import { CandidateResultPage } from '@/pages/CandidateResultPage';
 import { CandidateHomeworkPage } from '@/pages/CandidateHomeworkPage';
+import { CandidateResultsPage } from '@/pages/CandidateResultsPage';
+import { CandidateLeaderboardPage } from '@/pages/CandidateLeaderboardPage';
 import { InstructorHomeworkPage } from '@/pages/InstructorHomeworkPage';
 import { InstructorResultsPage } from '@/pages/InstructorResultsPage';
 import { InstructorAnalyticsPage } from '@/pages/InstructorAnalyticsPage';
@@ -125,6 +127,8 @@ export function App(): JSX.Element {
           <Route path="dashboard" element={<CandidateDashboardPage />} />
           <Route path="quizzes" element={<MyCandidateQuizzesPage />} />
           <Route path="homework" element={<CandidateHomeworkPage />} />
+          <Route path="results" element={<CandidateResultsPage />} />
+          <Route path="leaderboard" element={<CandidateLeaderboardPage />} />
           <Route path="quizzes/:id/start" element={<QuizAttemptPage />} />
           <Route path="quizzes/:id/result" element={<CandidateResultPage />} />
         </Route>

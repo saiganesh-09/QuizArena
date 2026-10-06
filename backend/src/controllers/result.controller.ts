@@ -2,6 +2,8 @@ import type { Request, Response, NextFunction } from 'express';
 import {
   getCandidateResult,
   getCandidatePerformance,
+  getCandidateResults,
+  getCandidateLeaderboard,
 } from '../services/candidateResult.service';
 import {
   getInstructorQuizResults,
@@ -14,6 +16,8 @@ import type { ApiSuccessBody } from '../types/auth';
 import type {
   CandidateResult,
   CandidatePerformance,
+  CandidateResultRowItem,
+  LeaderboardEntry,
   InstructorQuizResults,
   InstructorAttemptDetail,
   AdminAnalytics,
@@ -51,6 +55,34 @@ export function getCandidatePerformanceHandler(req: Request, res: Response, next
       if (!req.user?.sub) throw AppError.unauthorized('Authentication required');
       const result = await getCandidatePerformance(req.user.sub);
       const body: ApiSuccessBody<CandidatePerformance> = { success: true, data: result };
+      res.status(200).json(body);
+    } catch (err) {
+      next(err);
+    }
+  })();
+}
+
+/** GET /candidate/results — the candidate's own results history. */
+export function getCandidateResultsHandler(req: Request, res: Response, next: NextFunction): void {
+  void (async () => {
+    try {
+      if (!req.user?.sub) throw AppError.unauthorized('Authentication required');
+      const result = await getCandidateResults(req.user.sub);
+      const body: ApiSuccessBody<CandidateResultRowItem[]> = { success: true, data: result };
+      res.status(200).json(body);
+    } catch (err) {
+      next(err);
+    }
+  })();
+}
+
+/** GET /candidate/leaderboard — ranked aggregate stats across candidates. */
+export function getCandidateLeaderboardHandler(req: Request, res: Response, next: NextFunction): void {
+  void (async () => {
+    try {
+      if (!req.user?.sub) throw AppError.unauthorized('Authentication required');
+      const result = await getCandidateLeaderboard(req.user.sub);
+      const body: ApiSuccessBody<LeaderboardEntry[]> = { success: true, data: result };
       res.status(200).json(body);
     } catch (err) {
       next(err);

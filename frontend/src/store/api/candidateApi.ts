@@ -4,6 +4,8 @@ import type {
   CandidateQuizMeta,
   CandidateQuizListPayload,
   CandidatePerformance,
+  CandidateResultRowItem,
+  LeaderboardEntry,
 } from '@/types/quiz';
 import type { CandidateQuizListQuery } from '@/interfaces/candidate';
 
@@ -17,6 +19,8 @@ import type { CandidateQuizListQuery } from '@/interfaces/candidate';
 type CandidateQuizResponse = ApiResponse<CandidateQuizMeta>;
 type CandidateQuizListResponse = ApiResponse<CandidateQuizListPayload>;
 type CandidatePerformanceResponse = ApiResponse<CandidatePerformance>;
+type CandidateResultsResponse = ApiResponse<CandidateResultRowItem[]>;
+type LeaderboardResponse = ApiResponse<LeaderboardEntry[]>;
 
 function unwrap<T>(envelope: ApiResponse<T>): T {
   if (envelope.success) return envelope.data;
@@ -49,6 +53,18 @@ export const candidateApi = authApi.injectEndpoints({
       providesTags: [{ type: 'Quiz', id: 'candidate-performance' }],
     }),
 
+    getCandidateResults: builder.query<CandidateResultRowItem[], void>({
+      query: () => '/candidate/results',
+      transformResponse: (response: CandidateResultsResponse) => unwrap(response),
+      providesTags: [{ type: 'Quiz', id: 'candidate-results' }],
+    }),
+
+    getCandidateLeaderboard: builder.query<LeaderboardEntry[], void>({
+      query: () => '/candidate/leaderboard',
+      transformResponse: (response: LeaderboardResponse) => unwrap(response),
+      providesTags: [{ type: 'Quiz', id: 'candidate-leaderboard' }],
+    }),
+
     getCandidateQuiz: builder.query<CandidateQuizMeta, string>({
       query: (id) => `/candidate/quizzes/${id}`,
       transformResponse: (response: CandidateQuizResponse) => unwrap(response),
@@ -61,4 +77,6 @@ export const {
   useListCandidateQuizzesQuery,
   useGetCandidateQuizQuery,
   useGetCandidatePerformanceQuery,
+  useGetCandidateResultsQuery,
+  useGetCandidateLeaderboardQuery,
 } = candidateApi;

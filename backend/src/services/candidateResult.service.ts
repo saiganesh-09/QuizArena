@@ -1,14 +1,27 @@
 import mongoose from 'mongoose';
 import { AttemptModel } from '../models/Attempt';
 import { QuizModel, IQuestionDoc } from '../models/Quiz';
+import { User } from '../models/User';
 import { AppError } from '../utils/AppError';
 import type {
   CandidateResult,
   CandidatePerformance,
   CandidateScorePoint,
+  CandidateResultRowItem,
+  LeaderboardEntry,
   QuestionReview,
   AttemptStatus,
 } from '../types/quiz';
+
+const SUBMITTED: AttemptStatus[] = ['submitted', 'auto-submitted'];
+
+/** Remark band from a percentage (same bands used in instructor results). */
+function remarkForPercentage(pct: number): string {
+  if (pct >= 80) return 'Excellent';
+  if (pct >= 60) return 'Good';
+  if (pct >= 40) return 'Average';
+  return 'Needs Improvement';
+}
 
 /**
  * Candidate result service.
@@ -207,4 +220,122 @@ export async function getCandidatePerformance(
     latestQuizTitle,
     trend: points,
   };
+}
+
+/**
+ * Get the calling candidate's full results history — one row per
+ * submitted attempt with effective score, remark, and rank within the
+ * quiz's cohort. Contains ONLY the candidate's own data.
+ */
+export async function getCandidateResults(
+  candidateId: string,
+): Promise<CandidateResultRowItem[]> {
+  const attempts = await AttemptModel.find({
+    candidateId: new mongoose.Types.ObjectId(candidateId),
+    status: { $in: SUBMITTED },
+  }).exec();
+
+  if (attempts.length === 0) return [];
+
+  // Quiz titles/kinds for the attempts.
+  const quizIds = [...new Set(attempts.map((a) => a.quizId.toString()))];
+  const quizzes = await QuizModel.find({ _id: { $in: quizIds } })
+    .select('title kind')
+    .exec();
+  const quizMap = new Map(quizzes.map((q) => [q._id.toString(), q]));
+
+  // For rank: count higher-scoring attempts per quiz.
+  const cohorts = await AttemptModel.find({
+    quizId: { $in: quizIds.map((id) => new mongoose.Types.ObjectId(id)) },
+    status: { $in: SUBMITTED },
+  })
+    .select('quizId score scoreOverride')
+    .exec();
+  const byQuiz = new Map<string, { score: number; scoreOverride: number | null }[]>();
+  for (const c of cohorts) {
+    const list = byQuiz.get(c.quizId.toString()) ?? [];
+    list.push(c);
+    byQuiz.set(c.quizId.toString(), list);
+  }
+
+  return attempts
+    .map((a) => {
+      const score = a.scoreOverride ?? a.score;
+      const percentage = a.maxScore > 0 ? Math.round((score / a.maxScore) * 100) : 0;
+      const cohort = byQuiz.get(a.quizId.toString()) ?? [];
+      const quiz = quizMap.get(a.quizId.toString());
+      return {
+        attemptId: a._id.toString(),
+        quizId: a.quizId.toString(),
+        quizTitle: quiz?.title ?? a.quizTitle,
+        kind: quiz?.kind ?? 'quiz',
+        score,
+        maxScore: a.maxScore,
+        percentage,
+        remark: a.teacherRemark?.trim() || remarkForPercentage(percentage),
+        teacherRemark: a.teacherRemark ?? '',
+        rank: 1 + cohort.filter((o) => (o.scoreOverride ?? o.score) > score).length,
+        rankOutOf: cohort.length,
+        submittedAt: a.submittedAt instanceof Date ? a.submittedAt.toISOString() : null,
+      };
+    })
+    .sort((a, b) => (b.submittedAt ?? '').localeCompare(a.submittedAt ?? ''));
+}
+
+/**
+ * Leaderboard across all candidates — aggregate average/best score per
+ * student over submitted attempts. Returns name + stats only (no emails
+ * or attempt details); `isSelf` flags the calling candidate's row.
+ */
+export async function getCandidateLeaderboard(
+  candidateId: string,
+): Promise<LeaderboardEntry[]> {
+  const attempts = await AttemptModel.find({ status: { $in: SUBMITTED } })
+    .select('candidateId score scoreOverride maxScore')
+    .exec();
+
+  const byCandidate = new Map<string, number[]>();
+  for (const a of attempts) {
+    const id = a.candidateId.toString();
+    const score = a.scoreOverride ?? a.score;
+    const pct = a.maxScore > 0 ? (score / a.maxScore) * 100 : 0;
+    const list = byCandidate.get(id) ?? [];
+    list.push(pct);
+    byCandidate.set(id, list);
+  }
+
+  const users = await User.find({ _id: { $in: [...byCandidate.keys()] } })
+    .select('name')
+    .exec();
+  const nameMap = new Map(users.map((u) => [u._id.toString(), u.name]));
+
+  const entries: LeaderboardEntry[] = [...byCandidate.entries()]
+    .map(([id, pcts]) => ({
+      rank: 0,
+      candidateName: nameMap.get(id) ?? 'Unknown',
+      quizzesTaken: pcts.length,
+      averagePercentage: Math.round(pcts.reduce((s, p) => s + p, 0) / pcts.length),
+      bestPercentage: Math.round(Math.max(...pcts)),
+      isSelf: id === candidateId,
+    }))
+    .sort(
+      (a, b) =>
+        b.averagePercentage - a.averagePercentage ||
+        b.bestPercentage - a.bestPercentage ||
+        a.candidateName.localeCompare(b.candidateName),
+    );
+
+  let rank = 0;
+  let prevAvg = -1;
+  let prevBest = -1;
+  entries.forEach((e, i) => {
+    if (e.averagePercentage !== prevAvg || e.bestPercentage !== prevBest) {
+      rank = i + 1;
+      prevAvg = e.averagePercentage;
+      prevBest = e.bestPercentage;
+    }
+    e.rank = rank;
+  });
+
+  return entries;
 }

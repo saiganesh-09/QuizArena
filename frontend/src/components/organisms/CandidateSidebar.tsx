@@ -32,6 +32,14 @@ export function CandidateSidebar(): JSX.Element {
           <span className="qa-candidate-sidebar__icon" aria-hidden="true">📝</span>
           Homework
         </NavLink>
+        <NavLink to="/candidate/results" className={linkClass}>
+          <span className="qa-candidate-sidebar__icon" aria-hidden="true">🏅</span>
+          My Results
+        </NavLink>
+        <NavLink to="/candidate/leaderboard" className={linkClass}>
+          <span className="qa-candidate-sidebar__icon" aria-hidden="true">🏆</span>
+          Leaderboard
+        </NavLink>
       </nav>
     </aside>
   );

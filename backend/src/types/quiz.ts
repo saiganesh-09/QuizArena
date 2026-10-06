@@ -317,6 +317,33 @@ export interface CandidatePerformance {
   trend: CandidateScorePoint[];
 }
 
+/** One row in the candidate's own results history. */
+export interface CandidateResultRowItem {
+  attemptId: string;
+  quizId: string;
+  quizTitle: string;
+  kind: QuizKind;
+  score: number;
+  maxScore: number;
+  percentage: number;
+  remark: string;
+  teacherRemark: string;
+  rank: number;
+  rankOutOf: number;
+  submittedAt: string | null;
+}
+
+/** One row on the candidate leaderboard (aggregate stats per student). */
+export interface LeaderboardEntry {
+  rank: number;
+  candidateName: string;
+  quizzesTaken: number;
+  averagePercentage: number;
+  bestPercentage: number;
+  /** True when this row is the calling candidate. */
+  isSelf: boolean;
+}
+
 /** A single candidate's result row in the instructor aggregated view. */
 export interface CandidateResultRow {
   attemptId: string;

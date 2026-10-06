@@ -822,6 +822,30 @@ export const swaggerSpec: OpenAPIV3.Document = {
         },
       },
     },
+    '/candidate/results': {
+      get: {
+        tags: ['Candidate'],
+        summary: 'List the candidate\'s own submitted results (score, remark, rank per quiz)',
+        security: [{ cookieAuth: [] }],
+        responses: {
+          '200': { description: 'Results history rows' },
+          '401': { description: 'Unauthenticated' },
+          '403': { description: 'Not a candidate' },
+        },
+      },
+    },
+    '/candidate/leaderboard': {
+      get: {
+        tags: ['Candidate'],
+        summary: 'Leaderboard — candidates ranked by average percentage (names + aggregate stats only)',
+        security: [{ cookieAuth: [] }],
+        responses: {
+          '200': { description: 'Ranked leaderboard entries' },
+          '401': { description: 'Unauthenticated' },
+          '403': { description: 'Not a candidate' },
+        },
+      },
+    },
     '/candidate/quizzes': {
       get: {
         tags: ['Candidate'],
