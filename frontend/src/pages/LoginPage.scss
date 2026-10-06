@@ -19,25 +19,3 @@
     z-index: 10;
   }
 }
-
-.qa-login-page__demo {
-  margin-top: 1rem;
-  padding: 0.8rem 1rem;
-  border-top: 1px solid var(--qa-color-border);
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.qa-login-page__demo-title {
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--qa-color-muted);
-}
-
-.qa-login-page__demo-line {
-  font-size: 0.78rem;
-  color: var(--qa-color-muted);
-}

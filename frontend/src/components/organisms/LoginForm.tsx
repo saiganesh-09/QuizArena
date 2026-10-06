@@ -16,6 +16,13 @@ import './LoginForm.scss';
  * dashboard on success. Inline errors are shown for empty fields, bad
  * credentials, and network failures.
  */
+const DEMO_ACCOUNTS = [
+  { label: 'Admin', email: 'admin@quiz.com' },
+  { label: 'Teacher', email: 'teacher@quiz.com' },
+  { label: 'Candidate', email: 'candidate@quiz.com' },
+] as const;
+const DEMO_PASSWORD = 'Password123!';
+
 export function LoginForm(): JSX.Element {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -64,8 +71,18 @@ export function LoginForm(): JSX.Element {
     }
   }
 
+  function fillDemo(email: string): void {
+    setForm({ email, password: DEMO_PASSWORD });
+    setFieldErrors({});
+    setSubmitError(null);
+  }
+
   return (
     <form className="qa-login-form" onSubmit={handleSubmit} noValidate>
+      <div className="qa-login-form__brand">
+        <span className="qa-login-form__brand-mark">Q</span>
+        <span className="qa-login-form__brand-name">QuizArena</span>
+      </div>
       <h2 className="qa-login-form__title">Welcome back</h2>
       <p className="qa-login-form__subtitle">Sign in to your QuizArena account</p>
 
@@ -100,6 +117,22 @@ export function LoginForm(): JSX.Element {
       <Button type="submit" fullWidth isLoading={isLoading}>
         Sign in
       </Button>
+
+      <div className="qa-login-form__demo">
+        <span className="qa-login-form__demo-title">Try a demo account</span>
+        <div className="qa-login-form__demo-chips">
+          {DEMO_ACCOUNTS.map((acc) => (
+            <button
+              key={acc.email}
+              type="button"
+              className="qa-login-form__demo-chip"
+              onClick={() => fillDemo(acc.email)}
+            >
+              {acc.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <p className="qa-login-form__footer">
         Don&apos;t have an account?{' '}

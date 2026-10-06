@@ -4,10 +4,37 @@
   gap: 1rem;
   width: 100%;
   max-width: 400px;
-  padding: 2rem;
+  padding: 2.25rem 2rem;
   background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.25rem;
+  }
+
+  &__brand-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #4f8cff 0%, #6d5dfc 100%);
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  &__brand-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--qa-color-text, #1f2937);
+    letter-spacing: 0.01em;
+  }
 
   &__title {
     margin: 0;
@@ -28,6 +55,50 @@
     background-color: rgba(229, 72, 77, 0.1);
     color: var(--qa-color-danger, #e5484d);
     font-size: 0.875rem;
+  }
+
+  &__demo {
+    border-top: 1px solid var(--qa-color-border, #e5e7eb);
+    padding-top: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  &__demo-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--qa-color-muted, #6b7280);
+  }
+
+  &__demo-chips {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__demo-chip {
+    flex: 1;
+    min-width: 96px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--qa-color-border, #e5e7eb);
+    border-radius: 8px;
+    background-color: #f8fafc;
+    color: var(--qa-color-text, #1f2937);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--qa-color-primary, #4f8cff);
+      background-color: rgba(79, 140, 255, 0.08);
+      color: var(--qa-color-primary, #4f8cff);
+      outline: none;
+    }
   }
 
   &__footer {
