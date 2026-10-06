@@ -1,0 +1,109 @@
+.qa-resultshub {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  max-width: 1150px;
+  width: 100%;
+  margin: 0 auto;
+
+  &__heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--qa-color-text);
+    margin: 0;
+  }
+
+  &__subheading {
+    color: var(--qa-color-muted);
+    margin: 0.25rem 0 0;
+  }
+
+  &__loading {
+    padding: 3rem;
+    text-align: center;
+    color: var(--qa-color-muted);
+  }
+
+  &__card {
+    border: 1px solid var(--qa-color-border);
+    border-radius: 10px;
+    background-color: var(--qa-color-surface);
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+
+    th {
+      text-align: left;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--qa-color-muted);
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid var(--qa-color-border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid var(--qa-color-border);
+      color: var(--qa-color-text);
+      white-space: nowrap;
+    }
+
+    tr:last-child td { border-bottom: none; }
+  }
+
+  &__th--right,
+  &__td--right { text-align: right; }
+
+  &__title {
+    font-weight: 600;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__window {
+    color: var(--qa-color-muted);
+    font-size: 0.78rem;
+  }
+
+  &__status {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    background-color: var(--qa-color-surface-alt);
+    color: var(--qa-color-muted);
+
+    &--live { background-color: rgba(34, 197, 94, 0.15); color: #15803d; }
+    &--completed { background-color: rgba(100, 116, 139, 0.18); color: #475569; }
+    &--scheduled { background-color: rgba(59, 130, 246, 0.14); color: #1d4ed8; }
+  }
+
+  &__subs {
+    font-weight: 600;
+
+    &--has { color: var(--qa-color-primary); }
+  }
+
+  &__na { color: var(--qa-color-muted); }
+
+  &__view {
+    background: none;
+    border: none;
+    color: var(--qa-color-primary);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}

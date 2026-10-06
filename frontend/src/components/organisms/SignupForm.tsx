@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Input } from '@/components/atoms/Input';
 import { Button } from '@/components/atoms/Button';
 import { useSignupMutation } from '@/store/api/authApi';
@@ -23,10 +23,13 @@ export function SignupForm(): JSX.Element {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [signup, { isLoading }] = useSignupMutation();
+  const [searchParams] = useSearchParams();
+  const invitedEmail = searchParams.get('email') ?? '';
+  const invited = searchParams.has('invite');
 
   const [form, setForm] = useState<SignupFormData>({
     name: '',
-    email: '',
+    email: invitedEmail,
     password: '',
     confirmPassword: '',
   });
@@ -92,7 +95,9 @@ export function SignupForm(): JSX.Element {
   return (
     <form className="qa-signup-form" onSubmit={handleSubmit} noValidate>
       <h2 className="qa-signup-form__title">Create your account</h2>
-      <p className="qa-signup-form__subtitle">Join QuizArena as a participant</p>
+      <p className="qa-signup-form__subtitle">
+        {invited ? 'You were invited — create an account to accept it' : 'Join QuizArena as a participant'}
+      </p>
 
       {submitError ? (
         <div className="qa-signup-form__alert" role="alert">

@@ -2,6 +2,7 @@ import { User, IUserDocument } from '../models/User';
 import { QuizModel } from '../models/Quiz';
 import { AppError } from '../utils/AppError';
 import { signToken } from '../utils/jwt';
+import { acceptInvitesForUser } from './invite.service';
 import { jwtExpirySeconds } from '../utils/cookie';
 import type { UserProfile, UserRole } from '../types/auth';
 import type { SignupInput, LoginInput } from '../schemas/auth.schema';
@@ -60,6 +61,10 @@ export async function signupUser(input: SignupInput): Promise<AuthResult> {
   // Auto-assign the new candidate to all active quizzes so they can
   // see upcoming and live quizzes immediately after signup.
   await autoAssignToQuizzes(user._id, user.email, user.name);
+
+  // Accept any pending invites addressed to this email — the invited
+  // quizzes may be drafts/past windows that auto-assign skips.
+  await acceptInvitesForUser(user);
 
   return issueAuthResult(user);
 }

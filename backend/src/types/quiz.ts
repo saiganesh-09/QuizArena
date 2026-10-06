@@ -113,6 +113,20 @@ export interface InstructorQuiz extends Quiz {
   questionCount: number;
   participantCount: number;
   readiness: QuizReadiness;
+  /** Submitted attempts count (populated on list endpoints). */
+  submittedCount?: number;
+  /** Average effective percentage across submissions (null if none). */
+  averagePercentage?: number | null;
+}
+
+/** A student on the instructor's roster (participants of owned quizzes). */
+export interface InstructorStudent {
+  candidateId: string;
+  name: string;
+  email: string;
+  quizzesAssigned: number;
+  submittedCount: number;
+  averagePercentage: number | null;
 }
 
 /** Paginated list payload for instructor quizzes. */

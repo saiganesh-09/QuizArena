@@ -103,6 +103,7 @@ export function CandidateQuizTable({
                   <th className="qa-candidate-quiz-table__th">Title</th>
                   <th className="qa-candidate-quiz-table__th">Status</th>
                   <th className="qa-candidate-quiz-table__th">Starts</th>
+                  <th className="qa-candidate-quiz-table__th">Ends</th>
                   <th className="qa-candidate-quiz-table__th">Duration</th>
                   <th className="qa-candidate-quiz-table__th">Questions</th>
                   <th className="qa-candidate-quiz-table__th qa-candidate-quiz-table__th--right">Action</th>
@@ -121,6 +122,7 @@ export function CandidateQuizTable({
                       <Badge status={quiz.status} />
                     </td>
                     <td className="qa-candidate-quiz-table__td">{formatDateTime(quiz.startTime)}</td>
+                    <td className="qa-candidate-quiz-table__td">{formatDateTime(quiz.endTime)}</td>
                     <td className="qa-candidate-quiz-table__td">{quiz.durationMinutes} min</td>
                     <td className="qa-candidate-quiz-table__td">{quiz.questionCount}</td>
                     <td className="qa-candidate-quiz-table__td qa-candidate-quiz-table__td--right">

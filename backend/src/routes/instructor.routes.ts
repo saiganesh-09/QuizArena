@@ -20,6 +20,9 @@ import {
   addMyParticipant,
   removeMyParticipant,
   bulkUploadParticipantsHandler,
+  listMyStudents,
+  inviteStudent,
+  listMyInvites,
 } from '../controllers/instructor.controller';
 import {
   createQuestionSchema,
@@ -53,6 +56,9 @@ router.use(requireAuth, requireRole('instructor'));
 router.get('/quizzes', validateQuery(instructorQuizListQuerySchema), listMyQuizzes);
 router.post('/quizzes', validateBody(createQuizSchema), createMyQuiz);
 
+// ---- Students roster (instructor-scoped, no ownership needed) ----
+router.get('/students', listMyStudents);
+
 // ---- Quiz-scoped routes (require ownership) ----
 router.get('/quizzes/:id', requireQuizOwnership, getMyQuiz);
 router.patch('/quizzes/:id', requireQuizOwnership, validateBody(editQuizSchema), editMyQuiz);
@@ -77,6 +83,8 @@ router.post(
 // ---- Participants (require ownership) ----
 router.get('/quizzes/:id/participants', requireQuizOwnership, listMyParticipants);
 router.post('/quizzes/:id/participants', requireQuizOwnership, validateBody(addParticipantSchema), addMyParticipant);
+router.post('/quizzes/:id/invites', requireQuizOwnership, validateBody(addParticipantSchema), inviteStudent);
+router.get('/quizzes/:id/invites', requireQuizOwnership, listMyInvites);
 router.delete('/quizzes/:id/participants/:participantId', requireQuizOwnership, removeMyParticipant);
 router.post(
   '/quizzes/:id/participants/bulk-csv',

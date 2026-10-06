@@ -103,3 +103,67 @@
   &__csv-errors-title { margin: 0 0 0.5rem; font-weight: 700; color: var(--qa-color-danger, #e5484d); font-size: 0.875rem; }
   &__csv-errors-list { margin: 0; padding-left: 1.25rem; font-size: 0.8125rem; color: var(--qa-color-danger, #e5484d); }
 }
+
+.qa-participant-tab__invites {
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px dashed var(--qa-color-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.qa-participant-tab__invites-title {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--qa-color-muted);
+}
+
+.qa-participant-tab__invite-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.qa-participant-tab__invite-email {
+  font-weight: 600;
+  color: var(--qa-color-text);
+}
+
+.qa-participant-tab__invite-url {
+  flex: 1;
+  min-width: 200px;
+  font-size: 0.72rem;
+  color: var(--qa-color-muted);
+  background-color: var(--qa-color-surface-alt);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qa-participant-tab__invite-copy {
+  background: none;
+  border: 1px solid var(--qa-color-border);
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--qa-color-primary);
+  cursor: pointer;
+
+  &:hover { background-color: rgba(79, 140, 255, 0.08); }
+}
+
+.qa-participant-tab__invites-note {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--qa-color-muted);
+}

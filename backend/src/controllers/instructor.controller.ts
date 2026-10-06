@@ -25,6 +25,7 @@ import type { ApiSuccessBody } from '../types/auth';
 import type {
   InstructorQuiz,
   InstructorQuizListPayload,
+  InstructorStudent,
   Question,
   Participant,
   BulkUploadResult,
@@ -36,6 +37,8 @@ import type {
   InstructorQuizListQuery,
 } from '../schemas/instructor.schema';
 import { createQuiz } from '../services/quiz.service';
+import { createInvite, listInvites } from '../services/invite.service';
+import { listInstructorStudents } from '../services/instructorStudents.service';
 import type { CreateQuizInput, EditQuizInput } from '../schemas/quiz.schema';
 import type { Quiz } from '../types/quiz';
 
@@ -291,6 +294,50 @@ export function bulkUploadParticipantsHandler(req: Request, res: Response, next:
       const status = result.errors.length > 0 ? 422 : 201;
       const body: ApiSuccessBody<BulkUploadResult<Participant>> = { success: true, data: result };
       res.status(status).json(body);
+    } catch (err) {
+      next(err);
+    }
+  })();
+}
+
+/** GET /instructor/students — roster + stats across the instructor's quizzes. */
+export function listMyStudents(req: Request, res: Response, next: NextFunction): void {
+  void (async () => {
+    try {
+      if (!req.user?.sub) throw AppError.unauthorized('Authentication required');
+      const students = await listInstructorStudents(req.user.sub);
+      const body: ApiSuccessBody<InstructorStudent[]> = { success: true, data: students };
+      res.status(200).json(body);
+    } catch (err) {
+      next(err);
+    }
+  })();
+}
+
+/** POST /instructor/quizzes/:id/invites — invite a not-yet-registered email. */
+export function inviteStudent(req: Request, res: Response, next: NextFunction): void {
+  void (async () => {
+    try {
+      if (!req.user?.sub) throw AppError.unauthorized('Authentication required');
+      if (!req.loadedQuiz) throw AppError.internal('Quiz not loaded');
+      const input = req.body as AddParticipantInput;
+      const result = await createInvite(req.loadedQuiz, input.email, req.user.sub);
+      const body: ApiSuccessBody<typeof result> = { success: true, data: result };
+      res.status(201).json(body);
+    } catch (err) {
+      next(err);
+    }
+  })();
+}
+
+/** GET /instructor/quizzes/:id/invites — list pending invites for a quiz. */
+export function listMyInvites(req: Request, res: Response, next: NextFunction): void {
+  void (async () => {
+    try {
+      if (!req.loadedQuiz) throw AppError.internal('Quiz not loaded');
+      const invites = await listInvites(req.loadedQuiz);
+      const body: ApiSuccessBody<typeof invites> = { success: true, data: invites };
+      res.status(200).json(body);
     } catch (err) {
       next(err);
     }

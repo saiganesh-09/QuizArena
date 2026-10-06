@@ -10,6 +10,8 @@ import {
   useAddMyParticipantMutation,
   useRemoveMyParticipantMutation,
   useBulkUploadParticipantsMutation,
+  useListMyInvitesQuery,
+  useCreateMyInviteMutation,
 } from '@/store/api/instructorApi';
 import { useToast } from '@/components/organisms/ToastProvider';
 import { extractErrorMessage } from '@/utils/errors';
@@ -49,6 +51,11 @@ export function ParticipantTab({ quizId, isEditable, canRemove }: ParticipantTab
   const [removeTarget, setRemoveTarget] = useState<Participant | null>(null);
   const [removing, setRemoving] = useState<boolean>(false);
 
+  const { data: invites = [] } = useListMyInvitesQuery(quizId);
+  const [createInvite] = useCreateMyInviteMutation();
+  const [inviting, setInviting] = useState<boolean>(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
   async function handleAdd(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     setEmailError(null);
@@ -66,10 +73,43 @@ export function ParticipantTab({ quizId, isEditable, canRemove }: ParticipantTab
       }
       setEmail('');
     } catch (err) {
-      showToast('error', extractErrorMessage(err));
+      const message = extractErrorMessage(err);
+      // Unregistered email → offer the invite flow instead of just an error.
+      if (message.includes('No registered candidate')) {
+        setEmailError(`${message} — click Invite to send a signup link.`);
+      } else {
+        showToast('error', message);
+      }
     } finally {
       setAdding(false);
     }
+  }
+
+  async function handleInvite(): Promise<void> {
+    setEmailError(null);
+    if (!isValidEmail(email)) {
+      setEmailError('Enter a valid candidate email');
+      return;
+    }
+    setInviting(true);
+    try {
+      const result = await createInvite({ quizId, email }).unwrap();
+      if (result.inviteUrl) {
+        await navigator.clipboard.writeText(result.inviteUrl).catch(() => undefined);
+        showToast('success', `Invite created — link copied to clipboard. Share it with ${result.email}.`);
+        setEmail('');
+      }
+    } catch (err) {
+      showToast('error', extractErrorMessage(err));
+    } finally {
+      setInviting(false);
+    }
+  }
+
+  async function copyInvite(id: string, url: string): Promise<void> {
+    await navigator.clipboard.writeText(url).catch(() => undefined);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   }
 
   async function handleCsvUpload(file: File): Promise<void> {
@@ -124,7 +164,32 @@ export function ParticipantTab({ quizId, isEditable, canRemove }: ParticipantTab
             }}
           />
           <Button type="submit" variant="primary" isLoading={adding}>Add Participant</Button>
+          <Button type="button" variant="secondary" isLoading={inviting} onClick={() => void handleInvite()}>
+            Invite
+          </Button>
         </form>
+      ) : null}
+
+      {invites.length > 0 ? (
+        <div className="qa-participant-tab__invites">
+          <h4 className="qa-participant-tab__invites-title">Pending invites ({invites.length})</h4>
+          {invites.map((inv) => (
+            <div key={inv.id} className="qa-participant-tab__invite-row">
+              <span className="qa-participant-tab__invite-email">{inv.email}</span>
+              <code className="qa-participant-tab__invite-url">{inv.inviteUrl}</code>
+              <button
+                type="button"
+                className="qa-participant-tab__invite-copy"
+                onClick={() => void copyInvite(inv.id, inv.inviteUrl)}
+              >
+                {copiedId === inv.id ? 'Copied!' : 'Copy link'}
+              </button>
+            </div>
+          ))}
+          <p className="qa-participant-tab__invites-note">
+            Share the link — when they sign up they&apos;re added to this quiz automatically.
+          </p>
+        </div>
       ) : null}
 
       {isFetching ? (

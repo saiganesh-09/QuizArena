@@ -25,6 +25,8 @@ import { CandidateResultsPage } from '@/pages/CandidateResultsPage';
 import { CandidateLeaderboardPage } from '@/pages/CandidateLeaderboardPage';
 import { InstructorHomeworkPage } from '@/pages/InstructorHomeworkPage';
 import { InstructorResultsPage } from '@/pages/InstructorResultsPage';
+import { InstructorStudentsPage } from '@/pages/InstructorStudentsPage';
+import { InstructorResultsHubPage } from '@/pages/InstructorResultsHubPage';
 import { InstructorAnalyticsPage } from '@/pages/InstructorAnalyticsPage';
 import { AdminAnalyticsPage } from '@/pages/AdminAnalyticsPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
@@ -109,6 +111,8 @@ export function App(): JSX.Element {
           <Route path="dashboard" element={<InstructorDashboardPage />} />
           <Route path="quizzes" element={<MyQuizzesPage />} />
           <Route path="homework" element={<InstructorHomeworkPage />} />
+          <Route path="students" element={<InstructorStudentsPage />} />
+          <Route path="results" element={<InstructorResultsHubPage />} />
           <Route path="quizzes/:id" element={<UpdateQuizPage />} />
           <Route path="quizzes/:id/results" element={<InstructorResultsPage />} />
           <Route path="analytics" element={<InstructorAnalyticsPage />} />

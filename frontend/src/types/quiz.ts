@@ -132,10 +132,37 @@ export interface QuizReadiness {
 }
 
 /** Instructor quiz view (includes readiness + counts). */
+/** A student on the instructor's roster (participants of owned quizzes). */
+export interface InstructorStudent {
+  candidateId: string;
+  name: string;
+  email: string;
+  quizzesAssigned: number;
+  submittedCount: number;
+  averagePercentage: number | null;
+}
+
+/** Result of inviting an unregistered email to a quiz. */
+export interface InviteResult {
+  email: string;
+  registered: boolean;
+  inviteUrl: string | null;
+}
+
+/** A pending invite row on the instructor's quiz workspace. */
+export interface PendingInvite {
+  id: string;
+  email: string;
+  inviteUrl: string;
+  createdAt: string;
+}
+
 export interface InstructorQuiz extends Quiz {
   questionCount: number;
   participantCount: number;
   readiness: QuizReadiness;
+  submittedCount?: number;
+  averagePercentage?: number | null;
 }
 
 /** Paginated list payload for instructor quizzes. */

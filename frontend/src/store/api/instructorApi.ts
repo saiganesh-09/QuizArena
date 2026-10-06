@@ -3,6 +3,9 @@ import type { ApiResponse } from '@/types/auth';
 import type {
   InstructorQuiz,
   InstructorQuizListPayload,
+  InstructorStudent,
+  InviteResult,
+  PendingInvite,
   Quiz,
   Question,
   Participant,
@@ -235,6 +238,30 @@ export const instructorApi = authApi.injectEndpoints({
       ],
     }),
 
+    // ---- Students roster ----
+    listMyStudents: builder.query<InstructorStudent[], void>({
+      query: () => '/instructor/students',
+      transformResponse: (response: ApiResponse<InstructorStudent[]>) => unwrap(response),
+      providesTags: [{ type: 'Quiz', id: 'instructor-students' }],
+    }),
+
+    // ---- Invites (unregistered emails) ----
+    listMyInvites: builder.query<PendingInvite[], string>({
+      query: (quizId) => `/instructor/quizzes/${quizId}/invites`,
+      transformResponse: (response: ApiResponse<PendingInvite[]>) => unwrap(response),
+      providesTags: (_r, _e, quizId) => [{ type: 'Quiz', id: `invites-${quizId}` }],
+    }),
+
+    createMyInvite: builder.mutation<InviteResult, { quizId: string; email: string }>({
+      query: ({ quizId, email }) => ({
+        url: `/instructor/quizzes/${quizId}/invites`,
+        method: 'POST',
+        body: { email },
+      }),
+      transformResponse: (response: ApiResponse<InviteResult>) => unwrap(response),
+      invalidatesTags: (_r, _e, { quizId }) => [{ type: 'Quiz', id: `invites-${quizId}` }],
+    }),
+
     bulkUploadParticipants: builder.mutation<
       BulkUploadResult<Participant>,
       { quizId: string; file: File }
@@ -274,4 +301,7 @@ export const {
   useAddMyParticipantMutation,
   useRemoveMyParticipantMutation,
   useBulkUploadParticipantsMutation,
+  useListMyStudentsQuery,
+  useListMyInvitesQuery,
+  useCreateMyInviteMutation,
 } = instructorApi;

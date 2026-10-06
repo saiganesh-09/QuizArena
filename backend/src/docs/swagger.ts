@@ -731,6 +731,49 @@ export const swaggerSpec: OpenAPIV3.Document = {
         },
       },
     },
+    '/instructor/students': {
+      get: {
+        tags: ['Instructor'],
+        summary: 'Roster of students across the instructor\'s quizzes with submission stats',
+        security: [{ cookieAuth: [] }],
+        responses: {
+          '200': { description: 'Student roster rows' },
+          '401': { description: 'Unauthenticated' },
+          '403': { description: 'Not an instructor' },
+        },
+      },
+    },
+    '/instructor/quizzes/{id}/invites': {
+      post: {
+        tags: ['Instructor'],
+        summary: 'Invite an unregistered email — returns a shareable signup link; signup auto-assigns them to this quiz',
+        security: [{ cookieAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': { schema: { $ref: '#/components/schemas/AddParticipantInput' } },
+          },
+        },
+        responses: {
+          '201': { description: 'Invite created (inviteUrl) — share the link' },
+          '401': { description: 'Unauthenticated' },
+          '403': { description: 'Not the owner' },
+          '409': { description: 'Email already registered — use participant add' },
+        },
+      },
+      get: {
+        tags: ['Instructor'],
+        summary: 'List pending invites for a quiz',
+        security: [{ cookieAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Pending invites (id, email, inviteUrl, createdAt)' },
+          '401': { description: 'Unauthenticated' },
+          '403': { description: 'Not the owner' },
+        },
+      },
+    },
     '/instructor/quizzes/{id}/results/{attemptId}': {
       get: {
         tags: ['Instructor'],

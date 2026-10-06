@@ -1,4 +1,5 @@
 import { QuizModel, IQuizDocument } from '../models/Quiz';
+import { AttemptModel } from '../models/Attempt';
 import { AppError } from '../utils/AppError';
 import mongoose from 'mongoose';
 import type {
@@ -7,6 +8,7 @@ import type {
   QuizStatusStats,
   Quiz,
   QuizStatus,
+  AttemptStatus,
 } from '../types/quiz';
 import type { InstructorQuizListQuery } from '../schemas/instructor.schema';
 import type { EditQuizInput } from '../schemas/quiz.schema';
@@ -69,8 +71,42 @@ export async function listInstructorQuizzes(
 
   const stats = await computeInstructorStats(instructorId);
 
+  // Submission stats for the page's quizzes (used by the Results hub).
+  const quizIds = docs.map((d) => d._id);
+  const attemptAgg = await AttemptModel.aggregate<{
+    _id: mongoose.Types.ObjectId;
+    count: number;
+    avgPct: number;
+  }>([
+    {
+      $match: {
+        quizId: { $in: quizIds },
+        status: { $in: ['submitted', 'auto-submitted'] as AttemptStatus[] },
+      },
+    },
+    {
+      $project: {
+        pct: {
+          $cond: [
+            { $gt: ['$maxScore', 0] },
+            { $multiply: [{ $divide: [{ $ifNull: ['$scoreOverride', '$score'] }, '$maxScore'] }, 100] },
+            0,
+          ],
+        },
+      },
+    },
+    { $group: { _id: '$quizId', count: { $sum: 1 }, avgPct: { $avg: '$pct' } } },
+  ]).exec();
+  const attemptMap = new Map(attemptAgg.map((a) => [a._id.toString(), a]));
+
   return {
-    items: docs.map((d: IQuizDocument) => d.toInstructorQuiz()),
+    items: docs.map((d: IQuizDocument) => {
+      const quiz = d.toInstructorQuiz();
+      const a = attemptMap.get(d._id.toString());
+      quiz.submittedCount = a?.count ?? 0;
+      quiz.averagePercentage = a ? Math.round(a.avgPct) : null;
+      return quiz;
+    }),
     total,
     page: query.page,
     limit: query.limit,
